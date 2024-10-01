@@ -1,3 +1,5 @@
+// src\components\ProductCard.tsx
+
 import React from "react";
 import {
   Card,
@@ -32,7 +34,7 @@ const ProductCard: React.FC<Product> = ({
     >
       <Card sx={{ position: "relative", overflow: "hidden" }}>
         <Image
-          src={image}
+          src={image ? image : "/placeholder.jpg"}
           alt={name}
           width={500}
           height={300}

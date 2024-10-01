@@ -1,3 +1,5 @@
+// src\components\ProductList.tsx
+
 import React from 'react';
 import { Grid } from '@mui/material';
 import ProductCard from './ProductCard';
@@ -8,10 +10,17 @@ import { Product } from '@/data/types';
 // تابع fetch محصولات
 const fetchProducts = async (): Promise<Product[]> => {
   const { data } = await axios.get('http://localhost:3001/products');
-  return data.map((product: any) => ({
-    ...product,
-    id: product._id, // تبدیل _id به id
-  }));
+  
+  // بررسی اینکه آیا API لیستی از محصولات را برمی‌گرداند
+  if (Array.isArray(data)) {
+    return data.map((product: any) => ({
+      ...product,
+      id: product._id, // تبدیل _id به id
+    }));
+  } else {
+    console.error('Error: API did not return an array');
+    return [];
+  }
 };
 
 const ProductList: React.FC = () => {
@@ -26,17 +35,21 @@ const ProductList: React.FC = () => {
 
   return (
     <Grid container spacing={4}>
-      {allProducts.map((product) => (
-        <Grid item key={product.id} xs={12} sm={6} md={4}>
-          <ProductCard
-            id={product.id}           // اضافه کردن id به props
-            image={product.image}
-            name={product.name}
-            price={product.price}
-            sizes={product.sizes}      // ارسال اندازه‌ها
-          />
-        </Grid>
-      ))}
+      {allProducts.length > 0 ? (
+        allProducts.map((product) => (
+          <Grid item key={product.id} xs={12} sm={6} md={4}>
+            <ProductCard
+              id={product.id}           // اضافه کردن id به props
+              image={product.image}
+              name={product.name}
+              price={product.price}
+              sizes={product.sizes}      // ارسال اندازه‌ها
+            />
+          </Grid>
+        ))
+      ) : (
+        <div>No products available</div>
+      )}
     </Grid>
   );
 };

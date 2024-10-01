@@ -16,10 +16,10 @@ export class Product extends Document {
   discount: number; // درصد تخفیف
 
   @Prop({ type: MongooseSchema.Types.Mixed, required: true })
-  size: any; // آرایه‌ای از سایزها که می‌تواند هر نوع داده‌ای باشد (string، number و ...)
+  sizes: any; // تغییر به `sizes`
 
   @Prop({ type: MongooseSchema.Types.Mixed, required: true })
-  color: any; // فیلدی انعطاف‌پذیر برای رنگ‌ها
+  colors: any; // فیلدی انعطاف‌پذیر برای رنگ‌ها
 
   @Prop({ required: true })
   category: string; // کتگوری

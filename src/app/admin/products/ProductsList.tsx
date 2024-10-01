@@ -1,5 +1,3 @@
-// src/admin/products/ProductsList.tsx
-
 'use client';
 
 import React from 'react';

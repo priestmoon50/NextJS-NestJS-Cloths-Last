@@ -64,7 +64,6 @@ const ProductsPage: React.FC = () => {
         <AddProductForm onAddProduct={handleAddProduct} />
       )}
       <ProductsList
-        products={products}
         onDeleteProduct={handleDeleteProduct}
         onEditProduct={handleEditProduct}
       />
