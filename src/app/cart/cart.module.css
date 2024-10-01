@@ -1,0 +1,21 @@
+/* cart.module.css */
+.cartContainer {
+    margin-top: 100px;  /* برای اینکه فاصله از NavBar تنظیم شود */
+    padding: 20px;
+  }
+  
+  .cartTitle {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  .cartItem {
+    border-bottom: 1px solid #ccc;
+    padding: 10px 0;
+  }
+  
+  .cartItem p {
+    margin: 5px 0;
+  }
+  

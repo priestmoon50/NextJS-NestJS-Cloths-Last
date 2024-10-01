@@ -1,0 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap');
+
+.descriptionContainer {
+  font-family: 'Playfair Display', serif; /* استفاده از فونت شیک */
+  text-align: left;
+  color: rgb(255, 255, 255); /* تغییر رنگ به سفید */
+}
+
+/* تغییر موقعیت در دسکتاپ */
+@media (min-width: 1024px) {
+  .descriptionContainer {
+    text-align: right; /* در دسکتاپ متن به سمت راست برود */
+    margin-left: auto;
+    margin-right: 0;
+    max-width: 600px; /* محدود کردن عرض توضیحات */
+  }
+}
+
+.title a {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 700; /* اضافه کردن ضخامت بیشتر برای لینک */
+  transition: color 0.3s ease;
+}
+
+.title a:hover {
+  color: #551A8b;
+}
+
+/* ایجاد خط قبل از شروع متن و نمایش متن بالای خط */
+.typingContainer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px; /* فاصله از بالا */
+}
+
+.typingContainer::before {
+  content: '';
+  width: 100%;
+  height: 2px; /* ضخامت خط */
+  background-color: #ffffff; /* رنگ خط */
+  position: absolute;
+  top: -10px; /* قرارگیری خط بالای متن */
+  left: 0;
+}
+
+.typingText {
+  position: relative;
+  z-index: 1; /* نمایش متن بالای خط */
+
+  font-size: 1.3rem; /* بزرگ‌تر کردن فونت */
+  color: #ffffff;
+  margin-top: 20px; /* فاصله بین خط و متن */
+  animation: typing 4s steps(50, end); /* انیمیشن تایپ با 4 ثانیه */
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* انیمیشن تایپ */
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+/* حذف خط چشمک‌زن پس از پایان انیمیشن */
+.typingText::after {
+  content: ''; /* حذف نشانگر تایپ */
+}

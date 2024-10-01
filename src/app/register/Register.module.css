@@ -1,0 +1,107 @@
+/* === پس‌زمینه کلی صفحه === */
+.backgroundContainer {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background-image: url('/register.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  justify-content: center; /* وسط‌چین کردن فرم */
+  align-items: center;
+  overflow: hidden;
+  font-family: 'Roboto', sans-serif;
+  padding: 0 15px;
+}
+
+/* === استایل کلی فرم === */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 380px; /* کمی کاهش عرض فرم */
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+  padding: 40px;
+  margin: 20px;
+  
+}
+
+.linkButton {
+  font-size: 0.9rem;
+  color: #3f51b5;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.linkButtonRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%; /* عرض کامل برای ردیف */
+  margin-top: 20px; /* فاصله مناسب از فرم */
+}
+
+/* استایل فرم */
+.form {
+  margin-top: 16px;
+  width: 100%;
+  background-color: #ffffffe1;
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+}
+
+
+
+/* استایل لینک‌ها */
+.linkBox {
+  display: flex;
+  justify-content: space-between; /* لینک‌ها در کنار دکمه قرار بگیرند */
+  width: 100%;
+  margin-top: 16px;
+  color: #3f51b5;
+  align-items: center;
+}
+
+.linkBox a {
+  color: #3f51b5;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.linkBox a:hover {
+  color: #303f9f;
+  text-shadow: 0px 0px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* ریسپانسیو در موبایل */
+@media (max-width: 768px) {
+  .container {
+    max-width: 100%;
+    padding: 15px;
+    margin: 10px;
+  }
+
+  .form {
+    padding: 16px;
+  }
+
+
+
+  .linkBox {
+    flex-direction: row; /* لینک‌ها در کنار دکمه قرار گیرند */
+    justify-content: space-between; /* فاصله مناسب بین دکمه و لینک */
+    margin-top: 12px;
+  }
+
+  .linkBox a {
+    font-size: 0.85rem;
+  }
+}

@@ -1,0 +1,50 @@
+// src/admin/users/UsersList.tsx
+'use client';
+import React, { useState } from 'react';
+import { DataGrid, GridPaginationModel } from '@mui/x-data-grid';
+import { User } from '@/data/types'; // فرض می‌کنیم اینترفیس User از types.ts استخراج شده
+import styles from './UsersList.module.css'; // اضافه کردن CSS Module
+
+const users: User[] = [
+  {
+    id: '1',
+    name: 'John Doe',
+    email: 'john.doe@example.com',
+    role: 'Customer',
+  },
+  {
+    id: '2',
+    name: 'Jane Doe',
+    email: 'jane.doe@example.com',
+    role: 'Admin',
+  },
+  // سایر کاربران آزمایشی
+];
+
+const UsersList: React.FC = () => {
+  const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
+    page: 0,
+    pageSize: 5,
+  });
+
+  const columns = [
+    { field: 'id', headerName: 'User ID', width: 150 },
+    { field: 'name', headerName: 'Name', width: 150 },
+    { field: 'email', headerName: 'Email', width: 200 },
+    { field: 'role', headerName: 'Role', width: 150 },
+  ];
+
+  return (
+    <div className={styles.tableContainer}>
+      <DataGrid
+        rows={users}
+        columns={columns}
+        paginationModel={paginationModel}
+        onPaginationModelChange={setPaginationModel}
+        pageSizeOptions={[5, 10, 20]}
+      />
+    </div>
+  );
+};
+
+export default UsersList;
