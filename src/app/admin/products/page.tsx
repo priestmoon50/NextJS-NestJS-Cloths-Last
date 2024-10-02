@@ -6,6 +6,7 @@ import { Container, Typography } from '@mui/material';
 import ProductsList from './ProductsList';
 import AddProductForm from './AddProductForm';
 import { Product } from '@/data/types';
+import ImageUpload from './ImageUpload'; // ایمپورت کامپوننت ImageUpload
 
 const ProductsPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([
@@ -55,6 +56,8 @@ const ProductsPage: React.FC = () => {
       <Typography color='white' variant="h4" gutterBottom>
         Products Management
       </Typography>
+
+      {/* نمایش فرم افزودن/ویرایش محصول */}
       {editingProduct ? (
         <AddProductForm
           onAddProduct={handleUpdateProduct}
@@ -63,10 +66,19 @@ const ProductsPage: React.FC = () => {
       ) : (
         <AddProductForm onAddProduct={handleAddProduct} />
       )}
+
+      {/* نمایش لیست محصولات */}
       <ProductsList
+        products={products} 
         onDeleteProduct={handleDeleteProduct}
         onEditProduct={handleEditProduct}
       />
+
+      {/* نمایش کامپوننت ImageUpload به صورت جداگانه */}
+      <Typography color='white' variant="h5" gutterBottom sx={{ marginTop: '50px' }}>
+        Upload Images
+      </Typography>
+      <ImageUpload />
     </Container>
   );
 };

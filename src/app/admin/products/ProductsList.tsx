@@ -9,7 +9,9 @@ import axios from 'axios';
 import styles from './ProductsList.module.css';
 
 interface ProductsListProps {
+  onDeleteProduct: (id: number) => void;
   onEditProduct: (product: Product) => void;
+  products: Product[]; // مطمئن شوید که محصولات نیز به عنوان props تعریف شده‌اند
 }
 
 const fetchProducts = async (): Promise<Product[]> => {

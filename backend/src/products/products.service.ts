@@ -8,8 +8,13 @@ export class ProductsService {
   constructor(@InjectModel(Product.name) private productModel: Model<Product>) {}
 
   async create(productData: any): Promise<Product> {
-    const imageUrls = productData.image;  // آرایه‌ای از آدرس عکس‌ها که Multer ذخیره کرده
-    const newProduct = { ...productData, images: imageUrls };  // ذخیره آرایه عکس‌ها در دیتابیس
+    // اطمینان از اینکه آرایه‌ی URL تصاویر معتبر است
+    if (!productData.images || !Array.isArray(productData.images)) {
+      throw new Error('Images must be a valid array of URLs');
+    }
+
+    // ذخیره اطلاعات محصول به همراه تصاویر
+    const newProduct = { ...productData };
     const product = new this.productModel(newProduct);
     return await product.save();
   }

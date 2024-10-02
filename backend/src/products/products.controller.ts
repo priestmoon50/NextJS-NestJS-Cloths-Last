@@ -1,44 +1,45 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete, UploadedFiles, UseInterceptors } from '@nestjs/common';
-import { FilesInterceptor } from '@nestjs/platform-express'; // تغییر به FilesInterceptor برای آپلود چند فایل
-import { diskStorage } from 'multer';
+import { Controller, Get, Post, Body, Param, Patch, Delete } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { Product } from './product.schema';
-import { v4 as uuidv4 } from 'uuid';
-import { extname } from 'path';
-
-// تنظیم مسیر ذخیره‌سازی فایل و تغییر نام فایل
-const storage = diskStorage({
-  destination: './uploads', // مسیر ذخیره‌سازی فایل
-  filename: (req, file, cb) => {
-    const uniqueSuffix = uuidv4() + extname(file.originalname); // اضافه کردن پسوند و یک ID یکتا
-    cb(null, uniqueSuffix);
-  },
-});
 
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
-  @UseInterceptors(FilesInterceptor('image', 10, { storage })) // تغییر به FilesInterceptor برای آپلود چندین فایل
-  async create(@UploadedFiles() files: Express.Multer.File[], @Body() productData: any): Promise<Product> {
-    const imageUrls = files.map(file => `/uploads/${file.filename}`); // ایجاد آرایه‌ای از URL تصاویر
-    const productWithImages = { ...productData, images: imageUrls }; // اضافه کردن URL تصاویر به محصول
-    return this.productsService.create(productWithImages);
+  async create(@Body() productData: any): Promise<Product> {
+    try {
+      // بررسی اینکه آیا لیست URL تصاویر وجود دارد
+      if (!productData.images || productData.images.length === 0) {
+        throw new Error('Images are required for the product');
+      }
+  
+      // ارسال اطلاعات محصول به سرویس برای ایجاد محصول
+      return await this.productsService.create(productData);
+    } catch (error) {
+      console.error('Error creating product:', error.message);
+      throw new Error('Failed to create product');
+    }
   }
+  
 
   @Get()
   async findAll(): Promise<Product[]> {
+    // بازگرداندن لیست محصولات بدون نیاز به مدیریت URL تصاویر
     return this.productsService.findAll();
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<Product> {
+    // بازگرداندن اطلاعات محصول بدون نیاز به مدیریت URL تصاویر
     return this.productsService.findOne(id);
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() productData: Partial<Product>): Promise<Product> {
+  async update(
+    @Param('id') id: string,
+    @Body() productData: Partial<Product>,
+  ): Promise<Product> {
     return this.productsService.update(id, productData);
   }
 

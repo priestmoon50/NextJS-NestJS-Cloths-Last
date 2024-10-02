@@ -32,6 +32,7 @@ export const allProducts = () => {
           {/* اضافه کردن تصویر محصول */}
           {product.images && product.images.length > 0 && (
             <img src={product.images[0]} alt={product.name} width="100" />
+            
           )}
   
           {/* مدیریت سایزها */}

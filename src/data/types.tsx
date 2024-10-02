@@ -16,6 +16,7 @@ export interface Product {
   stock?: number;
   reviews?: string[];
   discount?: number;
+  imageUrl?: string
 }
 
 // تایپ‌های مربوط به فرم‌ها و سایر بخش‌ها به همان شکل قبلی باقی می‌مانند.
