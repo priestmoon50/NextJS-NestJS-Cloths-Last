@@ -3,19 +3,19 @@ import axios from 'axios';
 import { Box, Grid, Typography, Button } from '@mui/material';
 
 interface GalleryImageSelectorProps {
-  onAddImage: (imageUrl: string) => void; // تابع برای اضافه کردن URL تصویر به محصول
+  onAddImage: (imageUrl: string) => void; // Function to add the selected image to the product
 }
 
 const GalleryImageSelector: React.FC<GalleryImageSelectorProps> = ({ onAddImage }) => {
   const [images, setImages] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  // دریافت لیست تصاویر از API بک‌اند
+  // Fetch images from the backend
   useEffect(() => {
     const fetchImages = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/gallery'); // آدرس بک‌اند برای دریافت لیست تصاویر
-        setImages(response.data); // ذخیره لیست URL تصاویر در state
+        const response = await axios.get('http://localhost:3001/gallery');
+        setImages(response.data); // Store the list of image URLs
       } catch (error) {
         console.error('Error fetching images:', error);
       }
@@ -24,39 +24,70 @@ const GalleryImageSelector: React.FC<GalleryImageSelectorProps> = ({ onAddImage 
     fetchImages();
   }, []);
 
-  // مدیریت انتخاب تصویر
   const handleImageSelect = (image: string) => {
-    setSelectedImage(image); // ذخیره تصویر انتخاب‌شده
+    setSelectedImage(image); // Store the selected image
   };
 
-  // افزودن تصویر به محصول
   const handleAddImage = () => {
     if (selectedImage) {
-      onAddImage(selectedImage); // ارسال تصویر انتخاب‌شده به والد
+      onAddImage(selectedImage); // Add the selected image to the product
+    }
+  };
+
+  const handleDeleteImage = async (imageUrl: string) => {
+    const filename = imageUrl.split('/').pop(); // Extract the filename from the URL
+    try {
+      await axios.delete(`http://localhost:3001/gallery/${filename}`);
+      setImages(images.filter(img => img !== imageUrl)); // Remove the image from the local list
+      console.log(`Image ${filename} deleted successfully`);
+    } catch (error) {
+      console.error('Error deleting image:', error);
     }
   };
 
   return (
-    <Box sx={{ marginTop: '20px' }}>
+    <Box sx={{ marginTop: '20px', padding: '10px', backgroundColor: '#f5f5f5', borderRadius: '8px' }}>
       <Typography variant="h6" gutterBottom>
         Select an Image from Gallery
       </Typography>
 
-      <Grid container spacing={2}>
+      <Grid container spacing={1}> {/* Reduced spacing between images */}
         {images.map((image, index) => (
-          <Grid item xs={2} key={index}>
-            <img
-              src={image} // نمایش تصویر از URL
-              alt={`Gallery Image ${index}`}
-              style={{
-                width: '100px', // اندازه کوچک تصویر
-                height: '100px',
-                cursor: 'pointer',
-                border: selectedImage === image ? '2px solid blue' : 'none', // استایل برای تصویر انتخاب‌شده
-                objectFit: 'cover', // یکسان کردن نسبت تصاویر
+          <Grid item xs={6} sm={4} md={3} lg={1} key={index}>
+            <Box 
+              sx={{ 
+                position: 'relative', 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'center',
+                transition: 'transform 0.3s ease',
+                '&:hover': { transform: 'scale(1.05)' } 
               }}
-              onClick={() => handleImageSelect(image)} // انتخاب تصویر
-            />
+            >
+              <img
+                src={image} 
+                alt={`Gallery Image ${index}`}
+                style={{
+                  width: '85px', 
+                  height: '85px',
+                  cursor: 'pointer',
+                  border: selectedImage === image ? '2px solid blue' : 'none',
+                  objectFit: 'cover',
+                  borderRadius: '4px',
+                  marginBottom: '4px' // Small margin between the image and button
+                }}
+                onClick={() => handleImageSelect(image)} 
+              />
+              <Button
+                variant="contained"
+                color="error"
+                size="small"
+                sx={{ fontSize: '10px', padding: '2px 4px' }} // Smaller delete button
+                onClick={() => handleDeleteImage(image)}
+              >
+                Delete
+              </Button>
+            </Box>
           </Grid>
         ))}
       </Grid>
@@ -67,13 +98,13 @@ const GalleryImageSelector: React.FC<GalleryImageSelectorProps> = ({ onAddImage 
           <img 
             src={selectedImage} 
             alt="Selected" 
-            style={{ width: '300px', height: 'auto' }} // نمایش تصویر انتخاب شده با سایز بزرگ
+            style={{ width: '300px', height: 'auto', borderRadius: '8px' }} 
           />
           <Button 
             variant="contained" 
             color="primary" 
             onClick={handleAddImage}
-            sx={{ marginLeft: '20px' }}
+            sx={{ marginLeft: '20px', marginTop: '10px' }}
           >
             Add
           </Button>

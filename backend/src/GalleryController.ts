@@ -1,4 +1,4 @@
-import { Controller, Post, Get, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Controller, Post, Get, Delete, Param, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
@@ -25,7 +25,6 @@ export class GalleryController {
     return { fileUrl }; // بازگشت URL برای ذخیره در دیتابیس یا نمایش در فرانت‌اند
   }
 
-  // اضافه کردن مسیر GET برای بازگرداندن لیست تصاویر
   @Get()
   async getAllImages() {
     const directoryPath = path.join(__dirname, '../gallery');
@@ -43,5 +42,21 @@ export class GalleryController {
     // ایجاد URL کامل برای هر فایل
     const imageUrls = files.map(file => `http://localhost:3001/gallery/${file}`);
     return imageUrls; // بازگشت لیست URL‌های تصاویر به فرانت‌اند
+  }
+
+  @Delete(':filename') // مسیر حذف برای حذف فایل از سرور
+  async deleteImage(@Param('filename') filename: string) {
+    const filePath = path.join(__dirname, '../gallery', filename);
+    
+    // حذف فایل از پوشه
+    return new Promise<void>((resolve, reject) => {
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          reject(err); // مدیریت خطا در صورت وجود مشکل در حذف فایل
+        } else {
+          resolve(); // موفقیت‌آمیز بودن عملیات حذف
+        }
+      });
+    });
   }
 }
