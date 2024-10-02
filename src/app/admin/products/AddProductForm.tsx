@@ -7,7 +7,7 @@ import styles from "./AddProductForm.module.css";
 
 interface AddProductFormProps {
   onAddProduct: (product: Product) => void;
-  initialProduct?: Product; // prop برای ویرایش محصول
+  initialProduct?: Product;
 }
 
 const AddProductForm: React.FC<AddProductFormProps> = ({
@@ -19,20 +19,19 @@ const AddProductForm: React.FC<AddProductFormProps> = ({
       name: "",
       price: 0,
       description: "",
-      colors: [], // پیش‌فرض آرایه
-      sizes: [], // پیش‌فرض آرایه
+      colors: [],
+      sizes: [],
       category: "",
-      image: undefined, // پیش‌فرض مقدار `image`
+      image: undefined, // مقدار پیش‌فرض برای یک یا چند عکس
     },
   });
 
   useEffect(() => {
     if (initialProduct) {
-      reset(initialProduct); // پر کردن فرم با محصول مورد ویرایش
+      reset(initialProduct);
     }
   }, [initialProduct, reset]);
 
-  // تابع ارسال محصول به بک‌اند
   const onSubmit = async (data: Product) => {
     try {
       const formData = new FormData();
@@ -41,12 +40,13 @@ const AddProductForm: React.FC<AddProductFormProps> = ({
       formData.append("description", data.description || "");
       formData.append("category", data.category || "");
 
-      // اگر image وجود دارد به FormData اضافه شود
-      if (data.image) {
-        formData.append("image", data.image);
+      // اگر چندین عکس انتخاب شد، همه را اضافه کن
+      if (data.image && data.image.length > 0) {
+        Array.from(data.image).forEach((file) => {
+          formData.append("image", file); // هر عکس را به فرم‌دیتا اضافه کن
+        });
       }
 
-      // colors و sizes به عنوان آرایه به فرم‌دیتا اضافه شوند
       const colors = data.colors
         ? Array.isArray(data.colors)
           ? data.colors
@@ -58,8 +58,8 @@ const AddProductForm: React.FC<AddProductFormProps> = ({
           : [data.sizes]
         : [];
 
-      formData.append("colors", colors.join(",")); // آرایه به صورت رشته با جداکننده کاما
-      formData.append("sizes", sizes.join(",")); // آرایه به صورت رشته با جداکننده کاما
+      formData.append("colors", colors.join(","));
+      formData.append("sizes", sizes.join(","));
 
       const response = await axios.post(
         "http://localhost:3001/products",
@@ -72,7 +72,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({
       );
 
       console.log("Product added successfully:", response.data);
-      reset(); // ریست کردن فرم بعد از ارسال موفقیت‌آمیز
+      reset();
     } catch (error) {
       console.error("Error adding product:", error);
     }
@@ -108,7 +108,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({
         )}
       />
       <Controller
-        name="colors" // تغییر از color به colors
+        name="colors"
         control={control}
         render={({ field }) => (
           <TextField
@@ -119,7 +119,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({
         )}
       />
       <Controller
-        name="sizes" // تغییر از size به sizes
+        name="sizes"
         control={control}
         render={({ field }) => (
           <TextField
@@ -134,14 +134,16 @@ const AddProductForm: React.FC<AddProductFormProps> = ({
         control={control}
         render={({ field }) => <TextField {...field} label="Category" />}
       />
+
       <Controller
-        name="image"
+        name="image" // همچنان از image استفاده می‌کنیم
         control={control}
         render={({ field }) => (
           <TextField
             type="file"
+            inputProps={{ multiple: true }} // اجازه انتخاب چندین فایل
             onChange={(e) =>
-              field.onChange((e.target as HTMLInputElement).files?.[0])
+              field.onChange(Array.from((e.target as HTMLInputElement).files || []))
             }
           />
         )}

@@ -8,12 +8,11 @@ export class ProductsService {
   constructor(@InjectModel(Product.name) private productModel: Model<Product>) {}
 
   async create(productData: any): Promise<Product> {
-    const imageUrl = productData.image;  // آدرس عکس که Multer ذخیره کرده
-    const newProduct = { ...productData, image: imageUrl };  // ذخیره عکس در دیتابیس
+    const imageUrls = productData.image;  // آرایه‌ای از آدرس عکس‌ها که Multer ذخیره کرده
+    const newProduct = { ...productData, images: imageUrls };  // ذخیره آرایه عکس‌ها در دیتابیس
     const product = new this.productModel(newProduct);
     return await product.save();
- }
- 
+  }
 
   async findAll(): Promise<Product[]> {
     return this.productModel.find().exec();

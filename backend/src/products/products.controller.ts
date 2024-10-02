@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete, UploadedFile, UseInterceptors } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { Controller, Get, Post, Body, Param, Patch, Delete, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express'; // تغییر به FilesInterceptor برای آپلود چند فایل
 import { diskStorage } from 'multer';
 import { ProductsService } from './products.service';
 import { Product } from './product.schema';
@@ -20,11 +20,11 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
-  @UseInterceptors(FileInterceptor('image', { storage })) // آپلود فایل با Multer
-  async create(@UploadedFile() file: Express.Multer.File, @Body() productData: any): Promise<Product> {
-    const imageUrl = `/uploads/${file.filename}`; // مسیر فایل ذخیره‌شده
-    const productWithImage = { ...productData, images: [imageUrl] }; // اضافه کردن URL تصویر به محصول
-    return this.productsService.create(productWithImage);
+  @UseInterceptors(FilesInterceptor('image', 10, { storage })) // تغییر به FilesInterceptor برای آپلود چندین فایل
+  async create(@UploadedFiles() files: Express.Multer.File[], @Body() productData: any): Promise<Product> {
+    const imageUrls = files.map(file => `/uploads/${file.filename}`); // ایجاد آرایه‌ای از URL تصاویر
+    const productWithImages = { ...productData, images: imageUrls }; // اضافه کردن URL تصاویر به محصول
+    return this.productsService.create(productWithImages);
   }
 
   @Get()
