@@ -16,13 +16,16 @@ export class Product extends Document {
   discount: number; // درصد تخفیف
 
   @Prop({ type: MongooseSchema.Types.Mixed, required: true })
-  sizes: any; // تغییر به `sizes`
+  sizes: any; // فیلد مربوط به سایزها
 
   @Prop({ type: MongooseSchema.Types.Mixed, required: true })
-  colors: any; // فیلدی انعطاف‌پذیر برای رنگ‌ها
+  colors: any; // فیلد مربوط به رنگ‌ها
 
   @Prop({ required: true })
   category: string; // کتگوری
+
+  @Prop({ type: [String], default: [] }) // اضافه کردن آرایه‌ای از URL تصاویر
+  images: string[];
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

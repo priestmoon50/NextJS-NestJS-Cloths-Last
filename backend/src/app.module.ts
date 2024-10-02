@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ServeStaticModule } from '@nestjs/serve-static'; // وارد کردن ServeStaticModule
+import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CartController } from './cart/cart.controller';  
@@ -11,22 +13,27 @@ import { OrderSchema } from './Order/order.schema';
 import { ProductsService } from './products/products.service';
 import { ProductsController } from './products/products.controller';
 import { ProductSchema } from './products/product.schema';  
-import { UsersController } from './users/users.controller';  // اضافه کردن کنترلر کاربران
-import { UsersService } from './users/users.service';  // اضافه کردن سرویس کاربران
-import { UserSchema } from './users/user.schema';  // اضافه کردن مدل کاربران
+import { UsersController } from './users/users.controller';  
+import { UsersService } from './users/users.service';  
+import { UserSchema } from './users/user.schema';  
 import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
+    }),    
     MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/nestjs-shop'),  
     MongooseModule.forFeature([
       { name: 'Cart', schema: CartSchema },  
       { name: 'Order', schema: OrderSchema },  
       { name: 'Product', schema: ProductSchema },  
-      { name: 'User', schema: UserSchema },  // ثبت مدل User در Mongoose
-    ]), AuthModule,
+      { name: 'User', schema: UserSchema },  
+    ]), 
+    AuthModule,
   ],
-  controllers: [AppController, CartController, OrderController, ProductsController, UsersController],  // اضافه کردن کنترلر کاربران
-  providers: [AppService, CartService, OrderService, ProductsService, UsersService],  // اضافه کردن سرویس کاربران
+  controllers: [AppController, CartController, OrderController, ProductsController, UsersController],  
+  providers: [AppService, CartService, OrderService, ProductsService, UsersService],  
 })
 export class AppModule {}

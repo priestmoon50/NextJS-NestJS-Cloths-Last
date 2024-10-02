@@ -7,10 +7,13 @@ import { Product } from './product.schema';
 export class ProductsService {
   constructor(@InjectModel(Product.name) private productModel: Model<Product>) {}
 
-  async create(productData: Product): Promise<Product> {
-    const product = new this.productModel(productData);
+  async create(productData: any): Promise<Product> {
+    const imageUrl = productData.image;  // آدرس عکس که Multer ذخیره کرده
+    const newProduct = { ...productData, image: imageUrl };  // ذخیره عکس در دیتابیس
+    const product = new this.productModel(newProduct);
     return await product.save();
-  }
+ }
+ 
 
   async findAll(): Promise<Product[]> {
     return this.productModel.find().exec();

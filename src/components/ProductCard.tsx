@@ -1,5 +1,3 @@
-// src\components\ProductCard.tsx
-
 import React from "react";
 import {
   Card,
@@ -16,13 +14,16 @@ import Link from "next/link"; // ایمپورت لینک برای روتینگ
 
 const ProductCard: React.FC<Product> = ({
   id,
-  image,
+  images,
   name,
   price,
   discount,
 }) => {
   // محاسبه قیمت تخفیف‌خورده
   const discountedPrice = discount ? price - (price * discount) / 100 : null;
+
+  // دریافت آرایه تصاویر
+  const imagesArray = images ? images : [];
 
   return (
     <motion.div
@@ -34,13 +35,14 @@ const ProductCard: React.FC<Product> = ({
     >
       <Card sx={{ position: "relative", overflow: "hidden" }}>
         <Image
-          src={image ? image : "/placeholder.jpg"}
+          src={imagesArray.length > 0 ? `http://localhost:3000${imagesArray[0]}` : "/placeholder.jpg"}
           alt={name}
           width={500}
           height={300}
           style={{ width: "100%", height: "auto" }}
           priority={true}
         />
+
         <CardContent>
           <Typography variant="h6" component="div">
             {name}

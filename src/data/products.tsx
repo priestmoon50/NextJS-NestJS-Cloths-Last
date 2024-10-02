@@ -20,15 +20,20 @@ export const allProducts = () => {
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error fetching products</div>;
-
+  
   return (
     <div>
       {products.map((product: Product) => (
-        <div key={product.id}> {/* استفاده از id به جای _id */}
+        <div key={product.id}>
           <h2>{product.name}</h2>
           <p>Price: {product.price}</p>
           <p>Description: {product.description}</p>
           
+          {/* اضافه کردن تصویر محصول */}
+          {product.images && product.images.length > 0 && (
+            <img src={product.images[0]} alt={product.name} width="100" />
+          )}
+  
           {/* مدیریت سایزها */}
           {product.sizes && (
             <p>Size: 
@@ -37,7 +42,7 @@ export const allProducts = () => {
                 : product.sizes}
             </p>
           )}
-
+  
           {/* مدیریت رنگ‌ها */}
           {product.colors && (
             <p>Color: 
@@ -46,10 +51,11 @@ export const allProducts = () => {
                 : product.colors}
             </p>
           )}
-
-          {product.category && <p>Category: {product.category}</p>} {/* بررسی وجود کتگوری */}
+  
+          {product.category && <p>Category: {product.category}</p>}
         </div>
       ))}
     </div>
   );
+  
 };
