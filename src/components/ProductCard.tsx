@@ -35,7 +35,7 @@ const ProductCard: React.FC<Product> = ({
     >
       <Card sx={{ position: "relative", overflow: "hidden" }}>
         <Image
-          src={imagesArray.length > 0 ? `http://localhost:3000${imagesArray[0]}` : "/placeholder.jpg"}
+          src={imagesArray.length > 0 ? imagesArray[0] : "/placeholder.jpg"} // URL از قبل شامل http://localhost:3001 است
           alt={name}
           width={500}
           height={300}
