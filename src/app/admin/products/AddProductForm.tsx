@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { TextField, Button, Box, Typography, Grid } from "@mui/material";
+import { TextField, Button, Box, Typography, Grid, Select, MenuItem } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { Product } from "@/data/types";
 import axios from "axios";
@@ -28,13 +28,15 @@ const AddProductForm: React.FC<AddProductFormProps> = ({
   });
 
   const [addedImages, setAddedImages] = useState<string[]>([]); // ذخیره URL تصاویر انتخاب‌شده
+  const availableSizes = ["S", "M", "L", "XL", "2X Large"];
+  const availableColors = ["Red", "Blue", "Green", "Yellow"];
 
   useEffect(() => {
     if (initialProduct) {
       reset(initialProduct);
     }
   }, [initialProduct, reset]);
-
+  
   // اضافه کردن تصویر انتخاب‌شده به لیست تصاویر محصول
   const handleAddImage = (imageUrl: string) => {
     setAddedImages([...addedImages, imageUrl]);
@@ -45,8 +47,6 @@ const AddProductForm: React.FC<AddProductFormProps> = ({
       const productData = {
         ...data,
         images: addedImages, // اضافه کردن URL تصاویر به داده‌های محصول
-        colors: Array.isArray(data.colors) ? data.colors : [data.colors],
-        sizes: Array.isArray(data.sizes) ? data.sizes : [data.sizes],
       };
 
       // ارسال داده به بک‌اند به صورت JSON
@@ -89,28 +89,49 @@ const AddProductForm: React.FC<AddProductFormProps> = ({
           <TextField {...field} label="Description" multiline rows={4} />
         )}
       />
+
+      {/* انتخاب رنگ‌ها */}
       <Controller
         name="colors"
         control={control}
         render={({ field }) => (
-          <TextField
+          <Select
             {...field}
-            label="Colors (comma-separated)"
-            placeholder="red,blue,green"
-          />
+            multiple
+            value={field.value || []}
+            onChange={field.onChange}
+            renderValue={(selected) => (selected as string[]).join(', ')}
+          >
+            {availableColors.map((color) => (
+              <MenuItem key={color} value={color}>
+                {color}
+              </MenuItem>
+            ))}
+          </Select>
         )}
       />
+
+      {/* انتخاب سایزها */}
       <Controller
         name="sizes"
         control={control}
         render={({ field }) => (
-          <TextField
+          <Select
             {...field}
-            label="Sizes (comma-separated)"
-            placeholder="S,M,L"
-          />
+            multiple
+            value={field.value || []}
+            onChange={field.onChange}
+            renderValue={(selected) => (selected as string[]).join(', ')}
+          >
+            {availableSizes.map((size) => (
+              <MenuItem key={size} value={size}>
+                {size}
+              </MenuItem>
+            ))}
+          </Select>
         )}
       />
+
       <Controller
         name="category"
         control={control}

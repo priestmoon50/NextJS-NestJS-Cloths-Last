@@ -1,16 +1,15 @@
-import React from "react";
-import {
-  Card,
-  CardContent,
-  Typography,
-  Button,
-  Grid,
-  Box,
-} from "@mui/material";
-import Image from "next/image";
-import { Product } from "@/data/types";
-import { motion } from "framer-motion";
-import Link from "next/link"; // ایمپورت لینک برای روتینگ
+import React from 'react';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
+import Image from 'next/image';
+import { Product, CartItem } from '@/data/types';
+import { motion } from 'framer-motion';
+import Link from 'next/link';
+import { useCart } from '@/context/CartContext';
 
 const ProductCard: React.FC<Product> = ({
   id,
@@ -19,11 +18,30 @@ const ProductCard: React.FC<Product> = ({
   price,
   discount,
 }) => {
+  const { addItem, updateItem, cart } = useCart();
+
   // محاسبه قیمت تخفیف‌خورده
   const discountedPrice = discount ? price - (price * discount) / 100 : null;
 
   // دریافت آرایه تصاویر
   const imagesArray = images ? images : [];
+
+  const itemInCart = cart.items.find((item: CartItem) => item.id === id.toString());
+
+  const handleAddToCart = () => {
+    if (itemInCart) {
+      updateItem(id.toString(), itemInCart.quantity + 1);
+    } else {
+      addItem({
+        id: id.toString(),
+        name,
+        price: discountedPrice || price,
+        quantity: 1,
+        size: 'N/A',
+        color: 'N/A',
+      });
+    }
+  };
 
   return (
     <motion.div
@@ -33,13 +51,13 @@ const ProductCard: React.FC<Product> = ({
       transition={{ duration: 0.5 }}
       whileHover={{ scale: 1.05 }}
     >
-      <Card sx={{ position: "relative", overflow: "hidden" }}>
+      <Card sx={{ position: 'relative', overflow: 'hidden' }}>
         <Image
-          src={imagesArray.length > 0 ? imagesArray[0] : "/placeholder.jpg"} // URL از قبل شامل http://localhost:3001 است
+          src={imagesArray.length > 0 ? imagesArray[0] : '/placeholder.jpg'}
           alt={name}
           width={500}
           height={300}
-          style={{ width: "100%", height: "auto" }}
+          style={{ width: '100%', height: 'auto' }}
           priority={true}
         />
 
@@ -54,8 +72,8 @@ const ProductCard: React.FC<Product> = ({
                   variant="body2"
                   color="text.secondary"
                   sx={{
-                    textDecoration: "line-through",
-                    fontSize: { xs: "1rem", sm: "0.875rem" }, // بزرگ‌تر در موبایل، کوچک‌تر در دسکتاپ
+                    textDecoration: 'line-through',
+                    fontSize: { xs: '1rem', sm: '0.875rem' },
                   }}
                 >
                   ${price}
@@ -64,7 +82,7 @@ const ProductCard: React.FC<Product> = ({
                   variant="body2"
                   color="error"
                   sx={{
-                    fontSize: { xs: "1.25rem", sm: "1rem" }, // قیمت با تخفیف بزرگ‌تر در موبایل
+                    fontSize: { xs: '1.25rem', sm: '1rem' },
                   }}
                 >
                   ${discountedPrice}
@@ -78,7 +96,6 @@ const ProductCard: React.FC<Product> = ({
           </Box>
 
           <Grid container spacing={2} sx={{ mt: 2 }}>
-            {/* دکمه‌های ریسپانسیو و شیک‌تر */}
             <Grid item xs={12} sm={6}>
               <Link href={`/product/${id}`} passHref>
                 <Button
@@ -86,9 +103,9 @@ const ProductCard: React.FC<Product> = ({
                   color="primary"
                   fullWidth
                   sx={{
-                    padding: { xs: "1px 8px", sm: "8px 12px" }, // تغییر اندازه padding برای موبایل و دسکتاپ
-                    fontSize: { xs: "0.75rem", sm: "0.775rem" }, // تغییر اندازه فونت برای موبایل و دسکتاپ
-                    borderRadius: "4px",
+                    padding: { xs: '1px 8px', sm: '8px 12px' },
+                    fontSize: { xs: '0.75rem', sm: '0.775rem' },
+                    borderRadius: '4px',
                   }}
                 >
                   View Details
@@ -97,13 +114,14 @@ const ProductCard: React.FC<Product> = ({
             </Grid>
             <Grid item xs={12} sm={6}>
               <Button
-                variant="contained"
+                variant="outlined"
                 color="secondary"
                 fullWidth
+                onClick={handleAddToCart}
                 sx={{
-                  padding: { xs: "1px 8px", sm: "8px 12px" }, // تغییر اندازه padding برای موبایل و دسکتاپ
-                  fontSize: { xs: "0.75rem", sm: "0.775rem" }, // تغییر اندازه فونت برای موبایل و دسکتاپ
-                  borderRadius: "4px",
+                  padding: { xs: '1px 8px', sm: '8px 12px' },
+                  fontSize: { xs: '0.75rem', sm: '0.775rem' },
+                  borderRadius: '4px',
                 }}
               >
                 Add to Cart

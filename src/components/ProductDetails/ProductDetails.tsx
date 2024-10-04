@@ -1,19 +1,24 @@
-import { FC } from "react";
-import { Container, Grid, Typography, Button, Box } from "@mui/material";
+import { FC, useState } from "react";
+import { Container, Grid, Typography, Box, MenuItem, Select, TextField, Button } from "@mui/material";
 import ProductImages from "./ProductImages";
 import ProductPrice from "./ProductPrice";
 import ProductRating from "./ProductRating";
 import { Product } from "@/data/types";
 import Link from "next/link";
+import styles from "./ProductDetails.module.css"; // ایمپورت فایل CSS module
 
 const ProductDetails: FC<{ product: Product }> = ({ product }) => {
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [quantity, setQuantity] = useState<number>(1); // انتخاب تعداد پیش‌فرض
+
   const imagesArray = product.images ? product.images : [product.image];
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Box sx={{ mb: 3 }}>
+    <Container maxWidth="lg" className={styles.container}>
+      <Box>
         <Link href="/products" passHref>
-          <Button variant="outlined" color="primary">
+          <Button variant="outlined" className={styles.backButton}>
             Back to Products
           </Button>
         </Link>
@@ -24,8 +29,8 @@ const ProductDetails: FC<{ product: Product }> = ({ product }) => {
           <ProductImages images={imagesArray} />
         </Grid>
 
-        <Grid item xs={12} md={6}>
-          <Typography variant="h4" component="h1" gutterBottom>
+        <Grid item xs={12} md={6} className={styles.productInfo}>
+          <Typography variant="h4" component="h1" className={styles.productTitle}>
             {product.name}
           </Typography>
 
@@ -33,47 +38,63 @@ const ProductDetails: FC<{ product: Product }> = ({ product }) => {
 
           {product.rating && product.reviews && (
             <Box sx={{ mt: 2 }}>
-              <ProductRating
-                rating={product.rating}
-                reviewsCount={product.reviews.length}
-              />
+              <ProductRating rating={product.rating} reviewsCount={product.reviews.length} />
             </Box>
           )}
 
-          <Typography variant="body2" gutterBottom sx={{ mt: 2 }}>
+          <Typography variant="body2" className={styles.productDescription}>
             {product.description}
           </Typography>
 
-          <Typography variant="body2" gutterBottom>
+          <Typography variant="body2">
             Category: {product.category || "N/A"}
           </Typography>
 
-          {/* مدیریت سایزها */}
-          <Typography variant="body2" gutterBottom>
-            Available Sizes:
-            {product.sizes &&
-              (Array.isArray(product.sizes)
-                ? product.sizes.join(", ")
-                : product.sizes)}
-            {!product.sizes && "N/A"}
-          </Typography>
+          {/* انتخاب سایز */}
+          <Box className={styles.selectWrapper}>
+            <Typography variant="body2" className={styles.selectLabel}>Select Size:</Typography>
+            <Select
+              value={selectedSize || ""}
+              onChange={(e) => setSelectedSize(e.target.value as string)}
+              fullWidth
+            >
+              {Array.isArray(product.sizes) &&
+                product.sizes.map((size) => (
+                  <MenuItem key={size} value={size}>
+                    {size}
+                  </MenuItem>
+                ))}
+            </Select>
+          </Box>
 
-          <Typography variant="body2" gutterBottom>
-            Available Colors:
-            {product.colors &&
-              (Array.isArray(product.colors)
-                ? product.colors.join(", ")
-                : product.colors)}
-            {!product.colors && "N/A"}
-          </Typography>
+          {/* انتخاب رنگ */}
+          <Box className={styles.selectWrapper}>
+            <Typography variant="body2" className={styles.selectLabel}>Select Color:</Typography>
+            <Select
+              value={selectedColor || ""}
+              onChange={(e) => setSelectedColor(e.target.value as string)}
+              fullWidth
+            >
+              {Array.isArray(product.colors) &&
+                product.colors.map((color) => (
+                  <MenuItem key={color} value={color}>
+                    {color}
+                  </MenuItem>
+                ))}
+            </Select>
+          </Box>
 
-          <Button
-            variant="contained"
-            color="primary"
-            sx={{ mt: 3, padding: "10px 20px", fontSize: "16px" }}
-          >
-            Add to Cart
-          </Button>
+          {/* انتخاب تعداد */}
+          <Box className={styles.quantityInput}>
+            <Typography variant="body2" className={styles.selectLabel}>Quantity:</Typography>
+            <TextField
+              type="number"
+              value={quantity}
+              onChange={(e) => setQuantity(Number(e.target.value))}
+              inputProps={{ min: 1 }}
+              fullWidth
+            />
+          </Box>
         </Grid>
       </Grid>
     </Container>

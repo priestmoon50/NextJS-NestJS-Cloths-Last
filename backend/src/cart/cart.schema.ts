@@ -3,8 +3,8 @@ import { Document, Types } from 'mongoose';
 
 @Schema()
 export class CartProduct {
-  @Prop({ required: true })
-  productId: string;
+  @Prop({ type: Types.ObjectId, ref: 'Product', required: true })
+  productId: Types.ObjectId; // ارجاع به محصول
 
   @Prop({ required: true })
   quantity: number;
@@ -17,6 +17,12 @@ export class CartProduct {
 
   @Prop({ required: true })
   imageUrl: string;
+
+  @Prop({ type: String, required: false })
+  selectedSize?: string; // سایز انتخاب‌شده
+
+  @Prop({ type: String, required: false })
+  selectedColor?: string; // رنگ انتخاب‌شده
 }
 
 @Schema({ timestamps: true })

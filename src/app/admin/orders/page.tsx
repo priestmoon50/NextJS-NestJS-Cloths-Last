@@ -35,9 +35,9 @@ const OrdersPage: React.FC = () => {
     setOrderList(updatedOrders);
   };
 
-  if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Error loading orders</p>;
-
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading orders</div>;
+  
   return (
     <Container sx={{ marginTop: '100px' }}>
       <Typography color='white' variant="h4" gutterBottom>

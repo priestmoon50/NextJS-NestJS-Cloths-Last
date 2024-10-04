@@ -13,59 +13,104 @@ export class CartService {
 
   // ایجاد سبد خرید جدید برای کاربر یا مهمان
   async createCart(userId?: string): Promise<Cart> {
-    const newCart = await this.cartModel.create({
+    const newCart = new this.cartModel({
       userId: userId || null, // اگر کاربر لاگین نباشد، userId برابر null است
       cartId: uuidv4(), // استفاده از uuid برای تولید cartId برای کاربران مهمان
       products: [],
       status: 'active',
       totalPrice: 0,
     });
-    return newCart;
+    return newCart.save(); // ذخیره سبد جدید
   }
 
-  // اضافه کردن محصول به سبد خرید (با استفاده از cartId یا userId)
+  // اضافه کردن محصول به سبد خرید
   async addProductToCart(cartId: string, product: CartProduct): Promise<Cart> {
     const cart = await this.cartModel.findOne({ cartId });
     if (!cart) {
-      throw new NotFoundException('Cart not found');
+      throw new NotFoundException(`Cart with ID ${cartId} not found`);
     }
 
-    cart.products.push(product);
+    // بررسی وجود محصول در سبد
+    const existingProduct = cart.products.find(
+      (p) => p.productId.toString() === product.productId.toString() &&
+             p.selectedSize === product.selectedSize &&
+             p.selectedColor === product.selectedColor
+    );
+
+    if (existingProduct) {
+      // اگر محصول وجود دارد، تعداد آن به‌روزرسانی می‌شود
+      existingProduct.quantity += product.quantity;
+    } else {
+      // اگر محصول جدید است، به سبد اضافه می‌شود
+      cart.products.push(product);
+    }
+
+    // به‌روزرسانی قیمت کل
     cart.totalPrice += product.quantity * product.price;
-    return cart.save();
+
+    return cart.save(); // ذخیره سبد به‌روزشده
   }
 
   // حذف محصول از سبد خرید
   async removeProductFromCart(cartId: string, productId: string): Promise<Cart> {
     const cart = await this.cartModel.findOne({ cartId });
     if (!cart) {
-      throw new NotFoundException('Cart not found');
+      throw new NotFoundException(`Cart with ID ${cartId} not found`);
     }
 
-    const productIndex = cart.products.findIndex(p => p.productId === productId);
+    const productIndex = cart.products.findIndex(
+      (p) => p.productId.toString() === productId.toString()
+    );
+
     if (productIndex === -1) {
-      throw new NotFoundException('Product not found in cart');
+      throw new NotFoundException(`Product with ID ${productId} not found in cart`);
     }
 
+    // به‌روزرسانی قیمت کل پیش از حذف محصول
     cart.totalPrice -= cart.products[productIndex].quantity * cart.products[productIndex].price;
+
+    // حذف محصول از سبد
     cart.products.splice(productIndex, 1);
 
-    return cart.save();
+    return cart.save(); // ذخیره تغییرات
+  }
+
+  // به‌روزرسانی تعداد محصول در سبد خرید
+  async updateProductQuantity(cartId: string, productId: string, newQuantity: number): Promise<Cart> {
+    const cart = await this.cartModel.findOne({ cartId });
+    if (!cart) {
+      throw new NotFoundException(`Cart with ID ${cartId} not found`);
+    }
+
+    const product = cart.products.find((p) => p.productId.toString() === productId.toString());
+    if (!product) {
+      throw new NotFoundException(`Product with ID ${productId} not found in cart`);
+    }
+
+    // به‌روزرسانی تعداد محصول و قیمت کل
+    cart.totalPrice -= product.quantity * product.price; // حذف تاثیر تعداد قدیمی از قیمت کل
+    product.quantity = newQuantity;
+    cart.totalPrice += product.quantity * product.price; // اضافه کردن تاثیر تعداد جدید به قیمت کل
+
+    return cart.save(); // ذخیره سبد به‌روزشده
   }
 
   // دریافت اطلاعات سبد خرید با استفاده از cartId یا userId
-  async getCart(cartId: string): Promise<Cart> {
-    const cart = await this.cartModel.findOne({ cartId });
+  async getCart(cartId: string, userId?: string): Promise<Cart> {
+    const query = userId ? { userId } : { cartId };
+    const cart = await this.cartModel.findOne(query).lean(); // استفاده از lean برای بهینه‌سازی
+
     if (!cart) {
-      throw new NotFoundException('Cart not found');
+      throw new NotFoundException(`Cart not found`);
     }
     return cart;
   }
 
+  // دریافت سبد خرید برای کاربر لاگین‌شده
   async getCartByUser(userId: string): Promise<Cart> {
-    const cart = await this.cartModel.findOne({ userId });
+    const cart = await this.cartModel.findOne({ userId }).lean();
     if (!cart) {
-      throw new NotFoundException('Cart not found');
+      throw new NotFoundException(`Cart not found for user with ID ${userId}`);
     }
     return cart;
   }

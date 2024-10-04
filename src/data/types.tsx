@@ -3,7 +3,8 @@
 
 // تایپ‌های مربوط به محصولات
 export interface Product {
-  id: number;
+  _id: any;
+  id: string | number;
   name: string;
   price: number;
   image: string;
@@ -17,7 +18,20 @@ export interface Product {
   reviews?: string[];
   discount?: number;
   imageUrl?: string
+  quantity?: number;
+  
 }
+
+// تایپ‌های مربوط به آیتم‌های سبد خرید
+export interface CartItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  size?: string;
+  color?: string;
+}
+
 
 // تایپ‌های مربوط به فرم‌ها و سایر بخش‌ها به همان شکل قبلی باقی می‌مانند.
 

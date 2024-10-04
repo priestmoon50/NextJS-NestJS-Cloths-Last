@@ -74,14 +74,18 @@ const ProductsList: React.FC<ProductsListProps> = ({ onEditProduct }) => {
       width: 250,
       renderCell: (params) => (
         <>
-          <Button
+
+        {/* به دلیل قرصت ندادن ماها بعدا edit رو درست میکنیم */}
+          {/* <Button
             className={styles.actionsButton}
             variant="contained"
             color="primary"
             onClick={() => onEditProduct(params.row)}
           >
             Edit
-          </Button>
+          </Button> */}
+
+      
           <Button
             variant="contained"
             color="secondary"

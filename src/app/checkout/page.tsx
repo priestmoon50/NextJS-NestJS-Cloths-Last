@@ -1,113 +1,180 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
-import { useMutation } from '@tanstack/react-query'; // React Query برای مدیریت درخواست‌ها
-import styles from './checkout.module.css';  // CSS Module برای استایل‌دهی
+import React, { useState, useEffect } from "react";
+import {
+  Box,
+  Typography,
+  Button,
+  List,
+  ListItem,
+  ListItemText,
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  TextField,
+} from "@mui/material";
+import { useCart } from "@/context/CartContext";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
-interface CheckoutFormData {
-  name: string;
-  address: string;
-  city: string;
-  postalCode: string;
-  paymentMethod: string;
-}
+const CheckoutPage: React.FC = () => {
+  const { cart, removeItem, updateItem } = useCart();
+  const router = useRouter();
 
-interface OrderData {
-  userId: string;
-  shippingAddress: string;
-  paymentMethod: string;
-  products: { productId: string; quantity: number }[];
-  totalPrice: number;
-}
+  const [name, setName] = useState("");
+  const [address, setAddress] = useState("");
+  const [phone, setPhone] = useState("");
+  const [isGuest, setIsGuest] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
 
-export default function Checkout() {
-  const { register, handleSubmit, formState: { errors } } = useForm<CheckoutFormData>();
+  useEffect(() => {
+    // فرض کنیم که اطلاعات کاربر از پروفایل یا localStorage دریافت شود
+    const userData = JSON.parse(localStorage.getItem("user") || "{}");
+    if (userData && userData.name) {
+      setName(userData.name || "");
+      setAddress(userData.address || "");
+      setPhone(userData.phone || "");
+    } else {
+      setIsGuest(true);
+      setOpenModal(true);
+    }
+  }, []);
 
-  // Mutation برای ارسال اطلاعات به بک‌اند
-  const mutation = useMutation({
-    mutationFn: async (newOrder: OrderData) => {
-      const response = await fetch('http://localhost:3001/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newOrder),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to create order');
-      }
-      return response.json();
-    },
-  });
-
-  const onSubmit = (data: CheckoutFormData) => {
-    const orderData: OrderData = {
-      userId: '12345',  // فرضی، می‌توانید به صورت پویا دریافت کنید
-      shippingAddress: `${data.address}, ${data.city}, ${data.postalCode}`,
-      paymentMethod: data.paymentMethod,
-      products: [{ productId: '1', quantity: 2 }],  // به‌صورت فرضی
-      totalPrice: 200,  // به‌صورت فرضی
-    };
-    mutation.mutate(orderData);  // ارسال اطلاعات سفارش به بک‌اند
+  const handlePlaceOrder = () => {
+    // اینجا می‌توانید منطق ثبت سفارش را اضافه کنید
+    console.log("Order placed:", { name, address, phone, cartItems: cart.items });
+    router.push("/confirmation");
   };
 
   return (
-    <div className={styles.checkoutContainer}>
-      <h1>Checkout</h1>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className={styles.formGroup}>
-          <label>Name:</label>
-          <input
-            {...register('name', { required: 'Name is required' })}
-            className={styles.formInput}
-          />
-          {errors.name && <span className={styles.errorText}>{errors.name.message}</span>}
-        </div>
+    <Box sx={{ padding: "20px" }}>
+      <Typography variant="h4" gutterBottom>
+        Checkout
+      </Typography>
 
-        <div className={styles.formGroup}>
-          <label>Address:</label>
-          <input
-            {...register('address', { required: 'Address is required' })}
-            className={styles.formInput}
-          />
-          {errors.address && <span className={styles.errorText}>{errors.address.message}</span>}
-        </div>
+      <Dialog open={openModal} onClose={() => setOpenModal(false)}>
+        <DialogTitle>Sign In Required</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            To complete your purchase, please sign in.
+          </DialogContentText>
+          <Box sx={{ marginBottom: "20px" }}>
+            <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+              If you have an account, please <Link href="/login" style={{ color: "blue", fontWeight: "bold" }}>log in</Link>.
+            </Typography>
+            <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+              If you don't have an account, please <Link href="/register" style={{ color: "blue", fontWeight: "bold" }}>register</Link>.
+            </Typography>
+          </Box>
+        </DialogContent>
+      </Dialog>
 
-        <div className={styles.formGroup}>
-          <label>City:</label>
-          <input
-            {...register('city', { required: 'City is required' })}
-            className={styles.formInput}
-          />
-          {errors.city && <span className={styles.errorText}>{errors.city.message}</span>}
-        </div>
+      <Box sx={{ marginBottom: "20px" }}>
+        <TextField
+          fullWidth
+          label="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          sx={{ marginBottom: "10px" }}
+        />
+        <TextField
+          fullWidth
+          label="Address"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+          sx={{ marginBottom: "10px" }}
+        />
+        <TextField
+          fullWidth
+          label="Phone"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          sx={{ marginBottom: "20px" }}
+        />
+      </Box>
 
-        <div className={styles.formGroup}>
-          <label>Postal Code:</label>
-          <input
-            {...register('postalCode', { required: 'Postal code is required' })}
-            className={styles.formInput}
-          />
-          {errors.postalCode && <span className={styles.errorText}>{errors.postalCode.message}</span>}
-        </div>
+      <Typography variant="h5" gutterBottom>
+        Order Summary
+      </Typography>
+      {cart.items.length === 0 ? (
+        <Typography variant="h6">Your cart is currently empty.</Typography>
+      ) : (
+        <>
+          <List>
+            {cart.items.map((item) => (
+              <ListItem
+                key={item.id}
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <ListItemText
+                  primary={`${item.name} - $${item.price} x ${item.quantity}`}
+                  secondary={`Size: ${item.size || "N/A"}, Color: ${
+                    item.color || "N/A"
+                  }`}
+                />
 
-        <div className={styles.formGroup}>
-          <label>Payment Method:</label>
-          <select
-            {...register('paymentMethod', { required: 'Please select a payment method' })}
-            className={styles.formInput}
-          >
-            <option value="creditCard">Credit Card</option>
-            <option value="paypal">PayPal</option>
-          </select>
-          {errors.paymentMethod && <span className={styles.errorText}>{errors.paymentMethod.message}</span>}
-        </div>
+                <Box>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => updateItem(item.id, item.quantity + 1)}
+                    sx={{ marginRight: "10px" }}
+                  >
+                    +
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() =>
+                      updateItem(
+                        item.id,
+                        item.quantity > 1 ? item.quantity - 1 : 1
+                      )
+                    }
+                    sx={{ marginRight: "10px" }}
+                  >
+                    -
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    onClick={() => removeItem(item.id)}
+                  >
+                    Remove
+                  </Button>
+                </Box>
+              </ListItem>
+            ))}
+          </List>
 
-        <button type="submit" className={styles.formButton}>Complete Purchase</button>
-      </form>
-
-      {/* پیام موفقیت یا خطا */}
-      {mutation.isPending && <p>Loading...</p>}  
-      {mutation.isError && <p>Error: {mutation.error?.message}</p>}
-      {mutation.isSuccess && <p>Order created successfully!</p>}
-    </div>
+          <Box sx={{ marginTop: "20px", textAlign: "center" }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handlePlaceOrder}
+              sx={{ padding: "10px 20px" }}
+            >
+              Place Order
+            </Button>
+            <Link href="/cart" passHref>
+              <Button
+                variant="outlined"
+                color="secondary"
+                sx={{ marginLeft: "10px", padding: "10px 20px" }}
+              >
+                Back to Cart
+              </Button>
+            </Link>
+          </Box>
+        </>
+      )}
+    </Box>
   );
-}
+};
+
+export default CheckoutPage;
