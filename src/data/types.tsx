@@ -44,6 +44,7 @@ export interface User {
 }
 // تایپ‌های مربوط به سفارشات
 export interface Order {
+  [x: string]: string | number | Date;
   id: string;
   user: string;
   totalPrice: number;

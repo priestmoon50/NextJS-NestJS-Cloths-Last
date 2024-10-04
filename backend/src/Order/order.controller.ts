@@ -1,35 +1,27 @@
-import { Controller, Get, Post, Put, Param, Body } from '@nestjs/common';
-import { OrderService } from './order.service';
+import { Controller, Post, Get, Patch, Param, Body } from '@nestjs/common';
+import { OrdersService } from './orders.service';
+import { CreateOrderDto } from './dto/create-order.dto';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 
 @Controller('orders')
-export class OrderController {
-  constructor(private readonly orderService: OrderService) {}
+export class OrdersController {
+  constructor(private readonly ordersService: OrdersService) {}
 
-  @Post('create')
-  async createOrder(
-    @Body('userId') userId: string,
-    @Body('products') products: any[],
-    @Body('totalPrice') totalPrice: number,
-  ) {
-    return this.orderService.createOrder(userId, products, totalPrice);
+  @Post()
+  async createOrder(@Body() createOrderDto: CreateOrderDto) {
+    return this.ordersService.create(createOrderDto);
   }
 
-  @Get('user/:userId')
-  async getOrdersByUser(@Param('userId') userId: string) {
-    return this.orderService.getOrdersByUser(userId);
+  @Get(':id')
+  async getOrder(@Param('id') id: string) {
+    return this.ordersService.findOne(id);
   }
 
-  @Put('update-status/:orderId')
+  @Patch(':id/status')
   async updateOrderStatus(
-    @Param('orderId') orderId: string,
-    @Body('status') status: string,
+    @Param('id') id: string,
+    @Body() updateOrderStatusDto: UpdateOrderStatusDto,
   ) {
-    return this.orderService.updateOrderStatus(orderId, status);
-  }
-
-  // متد جدید برای تبدیل سبد خرید به سفارش
-  @Post('convert-cart/:userId')
-  async convertCartToOrder(@Param('userId') userId: string) {
-    return this.orderService.convertCartToOrder(userId);
+    return this.ordersService.updateStatus(id, updateOrderStatusDto);
   }
 }

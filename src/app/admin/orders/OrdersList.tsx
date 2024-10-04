@@ -1,58 +1,44 @@
-// src/admin/orders/OrdersList.tsx
-'use client';
-
 import React from 'react';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { Button } from '@mui/material';
+import { Box, Typography, List, ListItem, ListItemText, Select, MenuItem } from '@mui/material';
 import { Order } from '@/data/types';
-import styles from './OrdersList.module.css'; // اضافه کردن CSS Module
 
 interface OrdersListProps {
   orders: Order[];
-  onUpdateStatus: (id: string, newStatus: 'Pending' | 'Shipped' | 'Delivered' | 'Cancelled') => void;
+  onUpdateStatus: (orderId: string, newStatus: 'Pending' | 'Processing' | 'Completed') => void;
 }
 
 const OrdersList: React.FC<OrdersListProps> = ({ orders, onUpdateStatus }) => {
-  const columns: GridColDef[] = [
-    { field: 'id', headerName: 'Order ID', width: 150 },
-    { field: 'user', headerName: 'User', width: 150 },
-    { field: 'totalPrice', headerName: 'Total Price', width: 150 },
-    { field: 'status', headerName: 'Status', width: 150 },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      width: 250,
-      renderCell: (params) => (
-        <>
-          <Button
-            className={styles.buttonSpacing}
-            variant="contained"
-            color="primary"
-            onClick={() => onUpdateStatus(params.row.id, 'Shipped')}
-          >
-            Mark as Shipped
-          </Button>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => onUpdateStatus(params.row.id, 'Delivered')}
-          >
-            Mark as Delivered
-          </Button>
-        </>
-      ),
-    },
-  ];
-
   return (
-    <div className={styles.tableContainer}>
-      <DataGrid
-        rows={orders}
-        columns={columns}
-        pageSizeOptions={[5, 10, 20]}
-      />
-    </div>
+    <Box>
+      <Typography variant="h5" gutterBottom>
+        Orders List
+      </Typography>
+      {orders.length === 0 ? (
+        <Typography variant="h6">No orders available.</Typography>
+      ) : (
+        <List>
+          {orders.map((order) => (
+            <ListItem key={order.id} sx={{ marginBottom: '10px' }}>
+              <ListItemText
+                primary={`Order #${order.id} - Total: $${order.totalPrice}`}
+                secondary={`Status: ${order.status} | Placed on: ${new Date(order.createdAt).toLocaleDateString()}`}
+              />
+              <Select
+                value={order.status}
+                onChange={(e) => onUpdateStatus(order.id, e.target.value as 'Pending' | 'Processing' | 'Completed')}
+                sx={{ marginRight: '10px' }}
+              >
+                <MenuItem value="Pending">Pending</MenuItem>
+                <MenuItem value="Processing">Processing</MenuItem>
+                <MenuItem value="Completed">Completed</MenuItem>
+              </Select>
+            </ListItem>
+          ))}
+        </List>
+      )}
+    </Box>
   );
 };
 
 export default OrdersList;
+export type { OrdersListProps };

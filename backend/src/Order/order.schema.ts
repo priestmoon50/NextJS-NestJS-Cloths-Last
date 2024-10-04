@@ -1,30 +1,47 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
-import { CartProduct } from '../cart/cart.schema';
+import { Document } from 'mongoose';
+
+export type OrderDocument = Order & Document;
 
 @Schema()
 export class Order {
   @Prop({ required: true })
-  orderId: string;
+  userId: string;
 
-  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
-  userId: Types.ObjectId;
-
-  @Prop({ type: [CartProduct], required: true })
-  products: CartProduct[];
+  @Prop({ required: true, type: [{
+    productId: String,
+    name: String,
+    price: Number,
+    quantity: Number,
+    size: { type: String, required: false },
+    color: { type: String, required: false }
+  }]})
+  items: {
+    productId: string;
+    name: string;
+    price: number;
+    quantity: number;
+    size?: string;
+    color?: string;
+  }[];
 
   @Prop({ required: true })
   totalPrice: number;
 
-  @Prop({ required: true, enum: ['pending', 'completed', 'canceled'], default: 'pending' })
-  status: string; // وضعیت سفارش
+  @Prop({ required: true, enum: ['Pending', 'Processing', 'Completed'], default: 'Pending' })
+  status: 'Pending' | 'Processing' | 'Completed';
+
+  @Prop({ required: true })
+  name: string;
+
+  @Prop({ required: true })
+  address: string;
+
+  @Prop({ required: true })
+  phone: string;
 
   @Prop({ default: Date.now })
   createdAt: Date;
-
-  @Prop({ default: Date.now })
-  updatedAt: Date;
 }
 
-export type OrderDocument = Order & Document;
 export const OrderSchema = SchemaFactory.createForClass(Order);

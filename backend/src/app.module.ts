@@ -7,8 +7,8 @@ import { AppService } from './app.service';
 import { CartController } from './cart/cart.controller';
 import { CartService } from './cart/cart.service';
 import { CartSchema } from './cart/cart.schema';
-import { OrderController } from './order/order.controller';
-import { OrderService } from './order/order.service';
+import { OrdersController } from './order/order.controller';
+import { OrdersService } from './order/orders.service';
 import { OrderSchema } from './Order/order.schema';
 import { ProductsService } from './products/products.service';
 import { ProductsController } from './products/products.controller';
@@ -41,11 +41,11 @@ import { GalleryController } from './GalleryController';
   controllers: [
     AppController,
     CartController,
-    OrderController,
+    OrdersController,
     ProductsController,
     UsersController,
     GalleryController,
   ],
-  providers: [AppService, CartService, OrderService, ProductsService, UsersService],
+  providers: [AppService, CartService, OrdersService, ProductsService, UsersService],
 })
 export class AppModule {}

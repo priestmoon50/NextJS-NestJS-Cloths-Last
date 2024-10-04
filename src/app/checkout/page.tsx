@@ -41,10 +41,34 @@ const CheckoutPage: React.FC = () => {
     }
   }, []);
 
-  const handlePlaceOrder = () => {
-    // اینجا می‌توانید منطق ثبت سفارش را اضافه کنید
-    console.log("Order placed:", { name, address, phone, cartItems: cart.items });
-    router.push("/confirmation");
+  const handlePlaceOrder = async () => {
+    try {
+      const orderData = {
+        userId: "USER_ID_HERE", // باید ID کاربر وارد شده را قرار دهید
+        items: cart.items,
+        totalPrice: cart.items.reduce((acc, item) => acc + item.price * item.quantity, 0),
+        name,
+        address,
+        phone,
+        status: 'Pending',
+      };
+
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData),
+      });
+
+      if (response.ok) {
+        router.push('/confirmation');
+      } else {
+        console.error('Failed to place order');
+      }
+    } catch (error) {
+      console.error('Error placing order:', error);
+    }
   };
 
   return (

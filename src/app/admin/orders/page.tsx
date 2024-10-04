@@ -5,7 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Typography } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
-import OrdersList from './OrdersList';
+import OrdersList, { OrdersListProps } from './OrdersList';
 import { Order } from '@/data/types';
 
 const fetchOrders = async (): Promise<Order[]> => {
@@ -43,7 +43,7 @@ const OrdersPage: React.FC = () => {
       <Typography color='white' variant="h4" gutterBottom>
         Orders Management
       </Typography>
-      <OrdersList orders={orderList} onUpdateStatus={handleUpdateStatus} />
+      <OrdersList orders={orderList} onUpdateStatus={handleUpdateStatus as OrdersListProps['onUpdateStatus']} />
     </Container>
   );
 };
