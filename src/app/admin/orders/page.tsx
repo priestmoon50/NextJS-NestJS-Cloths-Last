@@ -1,9 +1,8 @@
 // src/admin/orders/page.tsx
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Container, Typography } from '@mui/material';
+import { Container, Typography, Snackbar, Alert } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import OrdersList, { OrdersListProps } from './OrdersList';
 import { Order } from '@/data/types';
@@ -20,6 +19,9 @@ const OrdersPage: React.FC = () => {
   });
 
   const [orderList, setOrderList] = useState<Order[]>([]);
+  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+  const [snackbarMessage, setSnackbarMessage] = useState<string>('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
 
   useEffect(() => {
     console.log("Orders data:", orders);  
@@ -33,6 +35,13 @@ const OrdersPage: React.FC = () => {
       order.id === id ? { ...order, status: newStatus } : order
     );
     setOrderList(updatedOrders);
+    setSnackbarMessage('Order status updated successfully');
+    setSnackbarSeverity('success');
+    setSnackbarOpen(true);
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
   };
 
   if (isLoading) return <div>Loading...</div>;
@@ -44,6 +53,11 @@ const OrdersPage: React.FC = () => {
         Orders Management
       </Typography>
       <OrdersList orders={orderList} onUpdateStatus={handleUpdateStatus as OrdersListProps['onUpdateStatus']} />
+      <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };

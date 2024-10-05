@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Typography, List, ListItem, ListItemText, Select, MenuItem } from '@mui/material';
 import { Order } from '@/data/types';
+import dayjs from 'dayjs';
 
 interface OrdersListProps {
   orders: Order[];
@@ -21,7 +22,7 @@ const OrdersList: React.FC<OrdersListProps> = ({ orders, onUpdateStatus }) => {
             <ListItem key={order.id} sx={{ marginBottom: '10px' }}>
               <ListItemText
                 primary={`Order #${order.id} - Total: $${order.totalPrice}`}
-                secondary={`Status: ${order.status} | Placed on: ${new Date(order.createdAt).toLocaleDateString()}`}
+                secondary={`Status: ${order.status} | Placed on: ${dayjs(order.createdAt).format('DD/MM/YYYY')}`}
               />
               <Select
                 value={order.status}
