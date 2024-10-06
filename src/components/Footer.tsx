@@ -42,7 +42,7 @@ const Footer: React.FC = () => {
             </Typography>
             <Box component="form">
               <TextField
-                label="Enter your email"
+                label="Enter your phone"
                 variant="outlined"
                 size="small"
                 fullWidth

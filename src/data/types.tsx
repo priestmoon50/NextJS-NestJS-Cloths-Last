@@ -17,9 +17,8 @@ export interface Product {
   stock?: number;
   reviews?: string[];
   discount?: number;
-  imageUrl?: string
+  imageUrl?: string;
   quantity?: number;
-  
 }
 
 // تایپ‌های مربوط به آیتم‌های سبد خرید
@@ -32,16 +31,14 @@ export interface CartItem {
   color?: string;
 }
 
-
-// تایپ‌های مربوط به فرم‌ها و سایر بخش‌ها به همان شکل قبلی باقی می‌مانند.
-
 // تایپ‌های مربوط به کاربران
 export interface User {
   id: string;
-  name: string;
-  email: string;
+  username: string;
+  phone: string;
   role: 'Customer' | 'Admin'; // تعیین نقش کاربران
 }
+
 // تایپ‌های مربوط به سفارشات
 export interface Order {
   [x: string]: string | number | Date;
@@ -67,13 +64,13 @@ export interface ProductImagesProps {
 
 // تایپ‌های مربوط به فرم‌ها
 export interface LoginFormInputs {
-  email: string;
+  phone: string;
   password: string;
 }
 
 export interface RegisterFormInputs {
-  name: string;
-  email: string;
+  username: string;
+  phone: string;
   password: string;
   confirmPassword: string;
 }
@@ -85,7 +82,6 @@ export interface PasswordFieldProps {
   error: boolean;
   helperText?: string;  // string | undefined
   register: any;
-  
 }
 
 export interface SubmitButtonProps {
@@ -99,5 +95,5 @@ export interface LinkButtonsProps {
 }
 
 export interface ForgotPasswordFormInputs {
-  email: string;
+  phone: string;
 }

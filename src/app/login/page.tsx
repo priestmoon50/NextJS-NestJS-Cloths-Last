@@ -1,7 +1,7 @@
 "use client";
 
-import React from 'react';
-import { Box, Container, TextField, Typography } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, Container, TextField, Typography, Alert } from '@mui/material';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { LoginFormInputs } from '@/data/types';
 import PasswordField from '@/app/login/LoginBranches/PasswordField';
@@ -12,11 +12,34 @@ import styles from '@/app/login/Login.module.css';
 
 const Login: React.FC = () => {
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginFormInputs>();
+  
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
     try {
-      console.log(data);
+      const response = await fetch('http://localhost:3001/users/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to log in. Please check your credentials.');
+      }
+
+      const result = await response.json();
+      setSuccessMessage('Login successful!');
+      setErrorMessage(null);
+      console.log('User logged in successfully:', result);
+
+      // در اینجا می‌توانید کارهایی مثل تغییر روت یا ذخیره JWT توکن انجام دهید
+
     } catch (error) {
+      setErrorMessage('Login failed. Please try again.');
+      setSuccessMessage(null);
       console.error('Error during login:', error);
     }
   };
@@ -32,18 +55,23 @@ const Login: React.FC = () => {
             <Typography component="h1" variant="h6">
               Sign In to your account
             </Typography>
+
+            {/* نمایش پیام‌ها */}
+            {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
+            {successMessage && <Alert severity="success">{successMessage}</Alert>}
+
             <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate className={styles.form}>
               <TextField
                 margin="normal"
                 fullWidth
-                label="Email"
-                autoComplete="email"
-                {...register('email', { 
-                  required: 'Email is required', 
-                  pattern: { value: /^\S+@\S+$/i, message: 'Enter a valid email' } 
+                label="Phone Number"
+                autoComplete="tel"
+                {...register('phone', { 
+                  required: 'Phone number is required', 
+                  pattern: { value: /^\+?[0-9]{10,15}$/, message: 'Enter a valid phone number' } 
                 })}
-                error={!!errors.email}
-                helperText={errors.email ? errors.email.message : ''}
+                error={!!errors.phone}
+                helperText={errors.phone ? errors.phone.message : ''}
               />
               <PasswordField
                 label="Password"

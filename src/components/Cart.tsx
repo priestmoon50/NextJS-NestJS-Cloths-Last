@@ -1,3 +1,5 @@
+'use client';
+
 import React from "react";
 import {
   Box,
@@ -9,42 +11,56 @@ import {
 } from "@mui/material";
 import { useCart } from "../context/CartContext";
 import Link from "next/link";
+import styles from "./Cart.module.css";
 
 const Cart: React.FC = () => {
   const { cart, removeItem, updateItem } = useCart();
 
   return (
-    <Box sx={{ padding: "20px" }}>
-      <Typography variant="h4" gutterBottom>
+    <Box className={styles.cartContainer}>
+      <Typography variant="h4" gutterBottom className={styles.cartTitle}>
         Your Shopping Cart
       </Typography>
       {cart.items.length === 0 ? (
-        <Typography variant="h6">Your cart is currently empty.</Typography>
+        <Typography variant="h6" className={styles.emptyCartMessage}>
+          Your cart is currently empty.
+        </Typography>
       ) : (
         <>
-          <List>
+          <List className={styles.cartList}>
             {cart.items.map((item) => (
-              <ListItem
-                key={item.id}
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
+              <ListItem key={item.id} className={styles.cartListItem}>
                 <ListItemText
-                  primary={`${item.name} - $${item.price} x ${item.quantity}`}
-                  secondary={`Size: ${item.size || "N/A"}, Color: ${
-                    item.color || "N/A"
-                  }`}
+                  primary={
+                    <Typography variant="h6" className={styles.itemName}>
+                      {item.name}
+                    </Typography>
+                  }
                 />
-
-                <Box>
+                <Box className={styles.itemDetailsList}>
+                  <Typography className={styles.productDetail}>
+                    <span className={styles.productDetailLabel}>Price:</span>
+                    <span className={styles.productDetailValue}>${item.price}</span>
+                  </Typography>
+                  <Typography className={styles.productDetail}>
+                    <span className={styles.productDetailLabel}>Quantity:</span>
+                    <span className={styles.productDetailValue}>{item.quantity}</span>
+                  </Typography>
+                  <Typography className={styles.productDetail}>
+                    <span className={styles.productDetailLabel}>Size:</span>
+                    <span className={styles.productDetailValue}>{item.size || "N/A"}</span>
+                  </Typography>
+                  <Typography className={styles.productDetail}>
+                    <span className={styles.productDetailLabel}>Color:</span>
+                    <span className={styles.productDetailValue}>{item.color || "N/A"}</span>
+                  </Typography>
+                </Box>
+                <Box className={styles.buttonContainer}>
                   <Button
                     variant="contained"
                     color="primary"
                     onClick={() => updateItem(item.id, item.quantity + 1)}
-                    sx={{ marginRight: "10px" }}
+                    className={styles.quantityButton}
                   >
                     +
                   </Button>
@@ -57,7 +73,7 @@ const Cart: React.FC = () => {
                         item.quantity > 1 ? item.quantity - 1 : 1
                       )
                     }
-                    sx={{ marginRight: "10px" }}
+                    className={styles.quantityButton}
                   >
                     -
                   </Button>
@@ -65,6 +81,7 @@ const Cart: React.FC = () => {
                     variant="outlined"
                     color="error"
                     onClick={() => removeItem(item.id)}
+                    className={styles.removeButton}
                   >
                     Remove
                   </Button>
@@ -73,9 +90,9 @@ const Cart: React.FC = () => {
             ))}
           </List>
 
-          <Box sx={{ marginTop: "20px", textAlign: "center" }}>
+          <Box className={styles.checkoutContainer}>
             <Link href="/checkout" passHref>
-              <Button variant="contained" color="primary">
+              <Button variant="contained" color="primary" className={styles.checkoutButton}>
                 Proceed to Checkout
               </Button>
             </Link>

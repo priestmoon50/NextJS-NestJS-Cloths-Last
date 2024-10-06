@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -12,16 +12,17 @@ import {
   ListItem,
   ListItemText,
   useMediaQuery,
-} from '@mui/material';
-import Image from 'next/image';
-import Link from 'next/link';
-import MenuIcon from '@mui/icons-material/Menu';
-import AccountMenu from './AccountMenu'; // ایمپورت کامپوننت جدید
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { useCart } from '../context/CartContext';
+  Badge,
+} from "@mui/material";
+import Image from "next/image";
+import Link from "next/link";
+import MenuIcon from "@mui/icons-material/Menu";
+import AccountMenu from "./AccountMenu"; // ایمپورت کامپوننت جدید
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import { useCart } from "../context/CartContext";
 
 const NavBar: React.FC = () => {
-  const isMobile = useMediaQuery('(max-width: 600px)');
+  const isMobile = useMediaQuery("(max-width: 600px)");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { cart } = useCart();
 
@@ -33,27 +34,48 @@ const NavBar: React.FC = () => {
     <AppBar
       position="fixed"
       sx={{
-        backgroundColor: 'rgba(30, 30, 31, 0.9)',
-        padding: '0 20px',
-        marginTop: '15px',
-        fontFamily: 'Roboto, sans-serif',
-        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.5)',
+        backgroundColor: "rgba(30, 30, 31, 0.9)",
+        padding: "0 20px",
+        marginTop: "15px",
+        fontFamily: "Roboto, sans-serif",
+        boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
         zIndex: 1300,
       }}
     >
-      <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Toolbar
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         {isMobile && (
-          <IconButton edge="start" color="inherit" onClick={toggleDrawer(!drawerOpen)}>
+          <IconButton
+            edge="start"
+            color="inherit"
+            onClick={toggleDrawer(!drawerOpen)}
+          >
             <MenuIcon />
           </IconButton>
         )}
 
         <Box
-          sx={{ flexGrow: 1, display: 'flex', justifyContent: isMobile ? 'center' : 'flex-start', alignItems: 'center' }}
+          sx={{
+            flexGrow: 1,
+            display: "flex",
+            justifyContent: isMobile ? "center" : "flex-start",
+            alignItems: "center",
+          }}
         >
           <Link href="/" passHref>
-            <Box sx={{ cursor: 'pointer' }}>
-              <Image src="/Logo.png" alt="Logo" width={150} height={60} priority={true} />
+            <Box sx={{ cursor: "pointer" }}>
+              <Image
+                src="/Logo.png"
+                alt="Logo"
+                width={150}
+                height={60}
+                priority={true}
+              />
             </Box>
           </Link>
         </Box>
@@ -61,20 +83,20 @@ const NavBar: React.FC = () => {
         {!isMobile && (
           <Box
             sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              gap: '20px',
-              fontSize: '16px',
-              color: '#fff',
+              display: "flex",
+              justifyContent: "center",
+              gap: "20px",
+              fontSize: "16px",
+              color: "#fff",
             }}
           >
             <Link href="/products" passHref>
               <Button
                 sx={{
-                  color: '#fff',
-                  '&:hover': {
-                    borderBottom: '2px solid #3f51b5',
-                    transition: 'border-bottom 0.3s ease',
+                  color: "#fff",
+                  "&:hover": {
+                    borderBottom: "2px solid #3f51b5",
+                    transition: "border-bottom 0.3s ease",
                   },
                 }}
               >
@@ -84,23 +106,24 @@ const NavBar: React.FC = () => {
             <Link href="/products" passHref>
               <Button
                 sx={{
-                  color: '#fff',
-                  '&:hover': {
-                    borderBottom: '2px solid #3f51b5',
-                    transition: 'border-bottom 0.3s ease',
+                  color: "#fff",
+                  "&:hover": {
+                    borderBottom: "2px solid #3f51b5",
+                    transition: "border-bottom 0.3s ease",
                   },
                 }}
               >
-                Collections
+                Sale
               </Button>
             </Link>
+
             <Link href="/products" passHref>
               <Button
                 sx={{
-                  color: '#fff',
-                  '&:hover': {
-                    borderBottom: '2px solid #3f51b5',
-                    transition: 'border-bottom 0.3s ease',
+                  color: "#fff",
+                  "&:hover": {
+                    borderBottom: "2px solid #3f51b5",
+                    transition: "border-bottom 0.3s ease",
                   },
                 }}
               >
@@ -113,34 +136,25 @@ const NavBar: React.FC = () => {
         <Box
           sx={{
             flexGrow: isMobile ? 0 : 1,
-            display: 'flex',
-            justifyContent: 'flex-end',
-            alignItems: 'center',
+            display: "flex",
+            justifyContent: "flex-end",
+            alignItems: "center",
           }}
         >
           <AccountMenu />
-          <IconButton color="inherit" sx={{ marginLeft: '20px' }}>
+          <IconButton
+            color="inherit"
+            sx={{ marginLeft: "40px", position: "relative" }}
+          >
             <Link href="/cart" passHref>
-              <ShoppingCartIcon />
+              <Badge
+                badgeContent={cart.items.length}
+                color="error"
+                overlap="circular"
+              >
+                <ShoppingCartIcon sx={{ fontSize: 32 }} />
+              </Badge>
             </Link>
-            <Box
-              sx={{
-                backgroundColor: '#f50057',
-                color: '#fff',
-                borderRadius: '50%',
-                width: '20px',
-                height: '20px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '12px',
-                position: 'absolute',
-                top: '10px',
-                right: '10px',
-              }}
-            >
-              {cart.items.length}
-            </Box>
           </IconButton>
         </Box>
       </Toolbar>
@@ -151,21 +165,21 @@ const NavBar: React.FC = () => {
           open={drawerOpen}
           onClose={toggleDrawer(false)}
           PaperProps={{
-            sx: { backgroundColor: '#1f1f1f', marginTop: '64px' },
+            sx: { backgroundColor: "#1f1f1f", marginTop: "64px" },
           }}
         >
           <List>
             <ListItem component="a" href="/products">
-              <ListItemText primary="New Arrivals" sx={{ color: '#fff' }} />
+              <ListItemText primary="New Arrivals" sx={{ color: "#fff" }} />
             </ListItem>
             <ListItem component="a" href="/products">
-              <ListItemText primary="Collections" sx={{ color: '#fff' }} />
+              <ListItemText primary="Collections" sx={{ color: "#fff" }} />
             </ListItem>
             <ListItem component="a" href="/products">
-              <ListItemText primary="Shop" sx={{ color: '#fff' }} />
+              <ListItemText primary="Shop" sx={{ color: "#fff" }} />
             </ListItem>
             <ListItem component="a" href="/cart">
-              <ListItemText primary="View Cart" sx={{ color: '#fff' }} />
+              <ListItemText primary="View Cart" sx={{ color: "#fff" }} />
             </ListItem>
           </List>
         </Drawer>

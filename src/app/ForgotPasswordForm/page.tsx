@@ -28,14 +28,14 @@ const ForgotPassword: React.FC = () => {
             <TextField
               margin="normal"
               fullWidth
-              label="Email"
-              autoComplete="email"
-              {...register('email', { 
-                required: 'Email is required', 
-                pattern: { value: /^\S+@\S+$/i, message: 'This field is required' }
+              label="Phone Number"
+              autoComplete="tel"
+              {...register('phone', { 
+                required: 'Phone number is required', 
+                pattern: { value: /^\+?[1-9]\d{1,14}$/, message: 'Please provide a valid phone number' }
               })}
-              error={!!errors.email}
-              helperText={errors.email ? errors.email.message : ''}
+              error={!!errors.phone}
+              helperText={errors.phone ? errors.phone.message : ''}
             />
             <Button
               type="submit"

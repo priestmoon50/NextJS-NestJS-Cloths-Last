@@ -26,7 +26,7 @@ export class AuthService {
 
   // متد login برای لاگین کاربر
   async login(loginDto: LoginDto): Promise<any> {
-    const user = await this.usersService.findByEmail(loginDto.email);
+    const user = await this.usersService.findByPhone(loginDto.phone);
   
     if (!user) {
       throw new UnauthorizedException('User not found');
@@ -38,10 +38,10 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // ایجاد payload شامل userId، email و username
+    // ایجاد payload شامل userId، phone و username
     const payload: JwtPayload = { 
       userId: user._id.toString(),  // تبدیل _id به رشته
-      email: user.email, 
+      phone: user.phone, 
       username: user.username,
     };
     
@@ -53,7 +53,7 @@ export class AuthService {
       accessToken,
       user: {
         id: user._id.toString(), // تبدیل _id به رشته
-        email: user.email,
+        phone: user.phone,
         username: user.username,
       },
     };
@@ -61,10 +61,10 @@ export class AuthService {
 
   // متد ثبت نام کاربر
   async register(registerDto: RegisterDto): Promise<any> {
-    // بررسی اینکه آیا ایمیل قبلاً ثبت شده یا خیر
-    const existingUser = await this.usersService.findByEmail(registerDto.email);
+    // بررسی اینکه آیا شماره تلفن قبلاً ثبت شده یا خیر
+    const existingUser = await this.usersService.findByPhone(registerDto.phone);
     if (existingUser) {
-      throw new ConflictException('Email already registered');
+      throw new ConflictException('Phone number already registered');
     }
 
     // هش کردن پسورد ورودی
@@ -74,13 +74,12 @@ export class AuthService {
     const createdUser = await this.usersService.create({
       ...registerDto,
       password: hashedPassword,
-      _id: new Types.ObjectId(), // اضافه کردن _id به صورت خودکار
     });
 
     // ایجاد payload برای JWT
     const payload: JwtPayload = {
       userId: createdUser._id.toString(), // تبدیل _id به رشته
-      email: createdUser.email,
+      phone: createdUser.phone,
       username: createdUser.username,
     };
 
@@ -92,7 +91,7 @@ export class AuthService {
       accessToken,
       user: {
         id: createdUser._id.toString(), // تبدیل _id به رشته
-        email: createdUser.email,
+        phone: createdUser.phone,
         username: createdUser.username,
       },
     };

@@ -8,11 +8,11 @@ export class User {
   @Prop({ required: true })
   username: string;
 
-  @Prop({ required: true })
-  password: string;
+  @Prop({ required: true, unique: true })
+  phone: string;  // شماره تماس با پشتیبانی از فرمت‌های مختلف
 
   @Prop({ required: true })
-  email: string;
+  password: string;
 
   _id?: Types.ObjectId; // اختیاری کردن _id
 }
