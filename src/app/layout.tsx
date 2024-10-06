@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider, HydrationBoundary } from '@tanstack/r
 import Head from 'next/head';
 import Footer from '@/components/Footer';
 import { CartProvider } from '@/context/CartContext';
+import { AuthProvider } from '@/context/AuthContext'; // وارد کردن AuthProvider
 
 const Layout: React.FC<{ children: React.ReactNode; dehydratedState?: unknown }> = ({ children, dehydratedState }) => {
   const [queryClient] = useState(() => new QueryClient());
@@ -21,13 +22,15 @@ const Layout: React.FC<{ children: React.ReactNode; dehydratedState?: unknown }>
       <body>
         <QueryClientProvider client={queryClient}>
           <HydrationBoundary state={dehydratedState}>
-            <CartProvider>
-              <NavBar />
-              <Container sx={{ minWidth: '80%' }}>
-                <Box my={4}>{children}</Box>
-              </Container>
-              <Footer />
-            </CartProvider>
+            <AuthProvider>  {/* اضافه کردن AuthProvider */}
+              <CartProvider>
+                <NavBar />
+                <Container sx={{ minWidth: '80%' }}>
+                  <Box my={4}>{children}</Box>
+                </Container>
+                <Footer />
+              </CartProvider>
+            </AuthProvider>
           </HydrationBoundary>
         </QueryClientProvider>
       </body>
