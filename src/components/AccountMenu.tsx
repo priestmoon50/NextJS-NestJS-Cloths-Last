@@ -7,40 +7,49 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import SettingsIcon from "@mui/icons-material/Settings";
 import SupportIcon from "@mui/icons-material/HelpOutline";
 import ShopIcon from "@mui/icons-material/ShoppingBag";
-import PersonAddIcon from "@mui/icons-material/PersonAdd"; // آیکون Sign Up
-import Image from "next/image"; // برای استفاده از تصویر
-import Link from "next/link"; // اضافه کردن لینک‌های Next.js
-import styles from "./AccountMenu.module.css"; // ایمپورت فایل CSS
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import Image from "next/image";
+import Link from "next/link";
+import { useAuth } from "@/context/AuthContext"; // استفاده از useAuth برای دسترسی به متدهای ورود و خروج
+import { useRouter } from "next/navigation"; // برای ریدایرکت
+import styles from "./AccountMenu.module.css";
 
 const AccountMenu: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const { logout, isAuthenticated } = useAuth(); // دسترسی به وضعیت ورود و متد logout
+  const router = useRouter(); // برای ریدایرکت
 
-  // مدیریت باز شدن منو
+  // مدیریت باز و بسته شدن منو
   const handleMouseEnter = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
-  // مدیریت بسته شدن منو
   const handleMouseLeave = () => {
     setAnchorEl(null);
+  };
+
+  // متد خروج
+  const handleLogout = () => {
+    logout(); // حذف توکن و خروج کاربر
+    router.push("/auth/phone-verification"); // ریدایرکت به صفحه Phone Verification برای ورود مجدد
   };
 
   return (
     <Box
       onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave} // بسته شدن منو وقتی که ماوس از روی باکس کلی خارج شد
-      sx={{ display: "inline-block" }} // اضافه کردن استایل نمایش به عنوان inline-block برای کنترل دقیق‌تر
+      onMouseLeave={handleMouseLeave}
+      sx={{ display: "inline-block" }}
     >
       <Button
         aria-haspopup="true"
         aria-expanded={Boolean(anchorEl) ? "true" : "false"}
         aria-controls="account-menu"
         sx={{
-          color: "#fff",
+          color: "#000000",
           display: "flex",
           alignItems: "center",
-          padding: "10px 20px", // بزرگ‌تر کردن کل دکمه
-          fontSize: "16px", // بزرگ‌تر کردن متن
+          padding: "10px 20px",
+          fontSize: "16px",
         }}
       >
         <AccountCircleIcon sx={{ marginRight: "5px" }} />
@@ -52,61 +61,63 @@ const AccountMenu: React.FC = () => {
         id="account-menu"
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
-        onClose={handleMouseLeave} // بستن منو وقتی که ماوس از روی منو رفت
+        onClose={handleMouseLeave}
         anchorOrigin={{
           vertical: "bottom",
-          horizontal: "center", // قرار گرفتن منو زیر "Account" در مرکز
+          horizontal: "center",
         }}
         transformOrigin={{
           vertical: "top",
-          horizontal: "center", // قرار گرفتن منو زیر "Account"
+          horizontal: "center",
         }}
         MenuListProps={{
           "aria-labelledby": "account-button",
         }}
         PaperProps={{
-          className: styles.menuPaper, // استفاده از استایل‌های CSS Modules
+          className: styles.menuPaper,
         }}
       >
-        {/* دکمه Log In */}
-        <Link href="/login" passHref> {/* لینک برای صفحه لاگین */}
-          <MenuItem onClick={handleMouseLeave} className={styles.logInButton}>
-            <Image
-              src="/IconLogin.png" // مسیر به تصویر در public
-              alt="Login Icon"
-              width={32} // اندازه بزرگ‌تر آیکون
-              height={32}
-              style={{ marginRight: "0.5px", marginTop: "5px", alignSelf: "center" }} // فاصله بیشتر از متن و وسط‌چین کردن
-            />
-            Log In
-          </MenuItem>
-        </Link>
+        {!isAuthenticated ? (
+          <>
+            {/* تغییر مسیرهای Log In و Sign Up به صفحه Phone Verification */}
+            <Link href="/auth/phone-verification" passHref>
+              <MenuItem onClick={handleMouseLeave} className={styles.logInButton}>
+                <Image
+                  src="/IconLogin.png"
+                  alt="Login Icon"
+                  width={32}
+                  height={32}
+                  style={{ marginRight: "0.5px", marginTop: "5px", alignSelf: "center" }}
+                />
+                Log In
+              </MenuItem>
+            </Link>
+            <Link href="/auth/phone-verification" passHref>
+              <MenuItem onClick={handleMouseLeave} className={styles.menuItemHover}>
+                <PersonAddIcon sx={{ marginRight: "10px" }} />
+                Sign Up
+              </MenuItem>
+            </Link>
+          </>
+        ) : (
+          <>
+            <MenuItem onClick={handleLogout} className={styles.menuItemHover}>
+              <AccountCircleIcon sx={{ marginRight: "10px" }} />
+              Logout
+            </MenuItem>
+          </>
+        )}
 
-        {/* Divider برای جدا کردن بخش‌ها */}
         <Divider className={styles.divider} />
-
-        {/* گزینه‌های Account Settings و Sign Up */}
         <MenuItem onClick={handleMouseLeave} className={styles.menuItemHover}>
           <SettingsIcon sx={{ marginRight: "10px" }} />
           Account Settings
         </MenuItem>
-
-        <Link href="/register" passHref> {/* لینک برای صفحه ثبت‌نام */}
-          <MenuItem onClick={handleMouseLeave} className={styles.menuItemHover}>
-            <PersonAddIcon sx={{ marginRight: "10px" }} />
-            Sign Up
-          </MenuItem>
-        </Link>
-
-        {/* Divider دیگر */}
         <Divider className={styles.divider} />
-
-        {/* گزینه‌های دیگر */}
         <MenuItem onClick={handleMouseLeave} className={styles.menuItemHover}>
           <SupportIcon sx={{ marginRight: "10px" }} />
           Support
         </MenuItem>
-
         <MenuItem onClick={handleMouseLeave} className={styles.menuItemHover}>
           <ShopIcon sx={{ marginRight: "10px" }} />
           Shop

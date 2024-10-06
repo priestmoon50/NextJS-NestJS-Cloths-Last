@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete, UseGuards, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, Delete, UseGuards,Request , UnauthorizedException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './user.schema';
 import { AuthGuard } from '@nestjs/passport';
@@ -19,6 +19,7 @@ export class UsersController {
     return this.usersService.create(userData);
   }
 
+  
   // متد ورود
   @Post('login')
   async login(@Body('phone') phone: string, @Body('password') password: string): Promise<any> {
@@ -44,7 +45,12 @@ export class UsersController {
   async findAll(): Promise<User[]> {
     return this.usersService.findAll();
   }
-
+  // دریافت اطلاعات کاربر جاری (محافظت‌شده) بر اساس JWT
+  @UseGuards(AuthGuard('jwt'))
+  @Get('me')
+  async getProfile(@Request() req): Promise<User> {
+    return this.usersService.findOne(req.user.sub); // استفاده از user id در توکن برای گرفتن اطلاعات
+  }
   // دریافت کاربر بر اساس ID (محافظت‌شده)
   @UseGuards(AuthGuard('jwt'))
   @Get(':id')

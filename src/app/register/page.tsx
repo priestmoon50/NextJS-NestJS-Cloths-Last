@@ -1,51 +1,44 @@
 "use client";
 
-import React, { useState } from "react";
-import { Box, Typography, Container, Alert } from "@mui/material";
+
+import { useState } from "react";
+import { Box, Typography, Container, Alert, CircularProgress } from "@mui/material";
 import { useForm, FormProvider, SubmitHandler } from "react-hook-form";
 import { RegisterFormInputs } from "@/data/types";
 import UsernameField from "@/app/register/RegisterBranches/UsernameField";
-import PhoneNumberField from "@/app/register/RegisterBranches/PhoneNumberField";
 import PasswordField from "@/app/register/RegisterBranches/PasswordField";
 import ConfirmPasswordField from "@/app/register/RegisterBranches/ConfirmPasswordField";
 import LinkButtons from "@/app/register/RegisterBranches/LinkButtons";
-import styles from "@/app/register/Register.module.css"; // ایمپورت CSS ماژول
+import styles from "@/app/register/Register.module.css";
 
-const Register: React.FC = () => {
+const Register: React.FC<{ phone: string }> = ({ phone }) => {
   const methods = useForm<RegisterFormInputs>();
-  const {
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = methods;
-
+  const { handleSubmit, formState: { errors, isSubmitting }, reset } = methods;
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const onSubmit: SubmitHandler<RegisterFormInputs> = async (data) => {
-    // حذف فیلد confirmPassword پیش از ارسال به سرور
-    const { confirmPassword, ...userData } = data;
+    setLoading(true); // شروع بارگذاری
+    setError(null);  // پاک کردن پیام خطا در ابتدا
+    setMessage(null); // پاک کردن پیام موفقیت
 
     try {
-      const response = await fetch("http://localhost:3001/users", {
+      const response = await fetch("/api/auth/register", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...data, phone }),  // ارسال شماره تلفن همراه اطلاعات
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to register user");
-      }
+      if (!response.ok) throw new Error("Failed to register user");
 
       const result = await response.json();
-      setMessage("User registered successfully!");
-      setError(null);
-      console.log("User registered successfully:", result);
+      setMessage("User registered successfully!"); // نمایش پیام موفقیت
+      reset(); // ریست کردن فرم
     } catch (error) {
       setError("Error during registration. Please try again.");
-      setMessage(null);
-      console.error("Error during registration:", error);
+    } finally {
+      setLoading(false); // توقف بارگذاری
     }
   };
 
@@ -54,10 +47,10 @@ const Register: React.FC = () => {
       <Container component="main" maxWidth="xs">
         <Box className={styles.container}>
           <Typography component="h1" variant="h4">
-            Signup
+            Register
           </Typography>
 
-          {/* نمایش پیام‌ها */}
+          {/* نمایش پیام‌های موفقیت و خطا */}
           {message && <Alert severity="success">{message}</Alert>}
           {error && <Alert severity="error">{error}</Alert>}
 
@@ -69,10 +62,13 @@ const Register: React.FC = () => {
               className={styles.form}
             >
               <UsernameField error={errors.username} />
-              <PhoneNumberField error={errors.phone} />
               <PasswordField error={errors.password} label="Password" />
               <ConfirmPasswordField error={errors.confirmPassword} />
-              <LinkButtons isSubmitting={isSubmitting} />
+
+              <Box className={styles.buttonContainer}>
+                <LinkButtons isSubmitting={isSubmitting || loading} />
+                {loading && <CircularProgress size={24} className={styles.progress} />} {/* نمایش بارگذاری */}
+              </Box>
             </Box>
           </FormProvider>
         </Box>

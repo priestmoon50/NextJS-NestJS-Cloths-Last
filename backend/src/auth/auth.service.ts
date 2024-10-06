@@ -1,16 +1,17 @@
-import { Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, ConflictException, UnauthorizedException, NotFoundException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt'; 
 import { JwtPayload } from './jwt-payload.interface';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
-import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
+  private verificationCodes = new Map<string, { code: string; expiresAt: number }>();
+
   constructor(
     private readonly usersService: UsersService,
-    private readonly jwtService: JwtService, // تزریق JwtService
+    private readonly jwtService: JwtService,
   ) {}
 
   // متد validateUser برای اعتبارسنجی JWT
@@ -29,29 +30,20 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
-
-    // مقایسه پسورد ارسال شده با پسورد هش شده در دیتابیس
-    console.log('Phone number entered:', loginDto.phone);
-    console.log('User found:', user);
-    console.log('Password entered:', loginDto.password);
-    console.log('Password in database:', user.password);
     const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
-    console.log('Password comparison result:', isPasswordValid);
+
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // ایجاد payload شامل userId، phone و username
     const payload: JwtPayload = { 
       userId: user._id.toString(),
       phone: user.phone,
       username: user.username,
     };
 
-    // تولید JWT با استفاده از payload و افزودن زمان انقضا
     const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
 
-    // بازگرداندن JWT به همراه اطلاعات کاربر
     return {
       message: 'User logged in successfully',
       accessToken,
@@ -64,39 +56,81 @@ export class AuthService {
   }
 
   // متد ثبت نام کاربر
-  async register(registerDto: RegisterDto): Promise<any> {
-    const existingUser = await this.usersService.findByPhone(registerDto.phone);
-    if (existingUser) {
-      throw new ConflictException('Phone number already registered');
+// ثبت‌نام کاربر
+async register(registerDto: { phone: string; username: string; password: string }) {
+  const existingUser = await this.usersService.findByPhone(registerDto.phone);
+  if (existingUser) {
+    throw new ConflictException('Phone number already registered');
+  }
+
+  const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+  const newUser = await this.usersService.create({
+    phone: registerDto.phone,
+    username: registerDto.username,
+    password: hashedPassword,
+  });
+
+  const payload: JwtPayload = {
+    userId: newUser._id.toString(),
+    phone: newUser.phone,
+    username: newUser.username,
+  };
+
+  const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
+
+  return {
+    message: 'Registration successful',
+    accessToken,
+    user: {
+      id: newUser._id.toString(),
+      phone: newUser.phone,
+      username: newUser.username,
+    },
+  };
+}
+
+  // ذخیره کد تایید به همراه زمان انقضا
+  async saveVerificationCode(phone: string, code: string): Promise<void> {
+    const expiresAt = Date.now() + 10 * 60 * 1000; // اعتبار کد تایید: 10 دقیقه
+    this.verificationCodes.set(phone, { code: await bcrypt.hash(code, 10), expiresAt });
+  }
+
+  // متد verifyCode برای بررسی کد با اعتبار
+  async verifyCode(phone: string, code: string): Promise<boolean> {
+    const verificationData = this.verificationCodes.get(phone);
+    if (!verificationData) {
+      throw new NotFoundException('Verification code not found');
+    }
+    
+    const { code: hashedCode, expiresAt } = verificationData;
+
+    if (Date.now() > expiresAt) {
+      this.verificationCodes.delete(phone); // حذف کد منقضی شده
+      throw new UnauthorizedException('Verification code expired');
     }
 
-    // هش کردن پسورد ورودی
-    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+    const isValid = await bcrypt.compare(code, hashedCode);
+    if (!isValid) {
+      throw new UnauthorizedException('Invalid verification code');
+    }
 
-    // ساخت کاربر جدید
-    const createdUser = await this.usersService.create({
-      ...registerDto,
-      password: hashedPassword,
-    });
+    this.verificationCodes.delete(phone); // حذف کد تایید پس از استفاده
+    return true;
+  }
 
-    // ایجاد payload برای JWT
+  // متد findByPhone برای جستجوی کاربر بر اساس شماره تلفن
+  async findByPhone(phone: string) {
+    return this.usersService.findByPhone(phone);
+  }
+
+  // متد generateToken برای تولید JWT
+  async generateToken(user: any): Promise<string> {
     const payload: JwtPayload = {
-      userId: createdUser._id.toString(),
-      phone: createdUser.phone,
-      username: createdUser.username,
+      userId: user._id.toString(),
+      phone: user.phone,
+      username: user.username,
     };
 
-    // تولید JWT با زمان انقضا
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
-
-    return {
-      message: 'User registered successfully',
-      accessToken,
-      user: {
-        id: createdUser._id.toString(),
-        phone: createdUser.phone,
-        username: createdUser.username,
-      },
-    };
+    return this.jwtService.sign(payload, { expiresIn: '1h' });
   }
 }

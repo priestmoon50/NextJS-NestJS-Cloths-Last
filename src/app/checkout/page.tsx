@@ -8,10 +8,6 @@ import {
   List,
   ListItem,
   ListItemText,
-  Dialog,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   TextField,
 } from "@mui/material";
 import { useCart } from "@/context/CartContext";
@@ -20,19 +16,19 @@ import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useAuth } from "@/context/AuthContext";
+import TokenService from "@/utils/TokenService"; 
+import SignInModal from "@/components/SignInModal"; 
 
 const validationSchema = yup.object().shape({
-  name: yup.string().required("Name is required"),
   address: yup.string().required("Address is required"),
-  phone: yup
-    .string()
-    .required("Phone number is required")
-    .matches(/^\d+$/, "Phone number must be numeric"),
 });
 
 const CheckoutPage: React.FC = () => {
   const { cart, removeItem, updateItem } = useCart();
   const router = useRouter();
+  const { isAuthenticated } = useAuth(); 
+  const [userData, setUserData] = useState({ name: "", phone: "" });
 
   const {
     handleSubmit,
@@ -42,29 +38,43 @@ const CheckoutPage: React.FC = () => {
     resolver: yupResolver(validationSchema),
   });
 
-  const [isGuest, setIsGuest] = useState(false);
   const [openModal, setOpenModal] = useState(false);
 
+  // گرفتن اطلاعات کاربر اگر وارد شده باشد
   useEffect(() => {
-    // Load user data from localStorage
-    const userData = JSON.parse(localStorage.getItem("user") || "{}");
-    if (!userData || !userData.name) {
-      setIsGuest(true);
-      setOpenModal(true);
+    const token = TokenService.getToken();
+    console.log("Token from localStorage:", token); // لاگ توکن
+    if (token) {
+      fetch("/api/users/me", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`, // استفاده از توکن در هدر
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log("User data from API:", data); // لاگ اطلاعات کاربر از API
+          setUserData({ name: data.name, phone: data.phone });
+        })
+        .catch((error) => console.error("Error fetching user data:", error));
+    } else {
+      setOpenModal(true); // مودال را باز نگه می‌داریم
     }
   }, []);
 
   const handlePlaceOrder = async (data: any) => {
     try {
       const orderData = {
-        userId: "USER_ID_HERE", // Replace with actual user ID
+        userId: "USER_ID_HERE", 
         items: cart.items,
         totalPrice: cart.items.reduce((acc, item) => acc + item.price * item.quantity, 0),
-        name: data.name,
+        name: userData.name, 
         address: data.address,
-        phone: data.phone,
+        phone: userData.phone, 
         status: 'Pending',
       };
+
+      console.log("Order data being sent to API:", orderData); // لاگ اطلاعات سفارش
 
       const response = await fetch('/api/orders', {
         method: 'POST',
@@ -90,39 +100,19 @@ const CheckoutPage: React.FC = () => {
         Checkout
       </Typography>
 
-      <Dialog open={openModal} onClose={() => setOpenModal(false)}>
-        <DialogTitle>Sign In Required</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            To complete your purchase, please sign in.
-          </DialogContentText>
-          <Box sx={{ marginBottom: "20px" }}>
-            <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-              If you have an account, please <Link href="/login" style={{ color: "blue", fontWeight: "bold" }}>log in</Link>.
-            </Typography>
-            <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-              If you don't have an account, please <Link href="/register" style={{ color: "blue", fontWeight: "bold" }}>register</Link>.
-            </Typography>
-          </Box>
-        </DialogContent>
-      </Dialog>
+      {/* مودال غیرقابل بستن */}
+      <SignInModal open={openModal} />
 
       <form onSubmit={handleSubmit(handlePlaceOrder)}>
         <Box sx={{ marginBottom: "20px" }}>
-          <Controller
-            name="name"
-            control={control}
-            defaultValue=""
-            render={({ field }) => (
-              <TextField
-                {...field}
-                fullWidth
-                label="Name"
-                error={!!errors.name}
-                helperText={errors.name ? errors.name.message : ""}
-                sx={{ marginBottom: "10px" }}
-              />
-            )}
+          <TextField
+            fullWidth
+            label="Name"
+            value={userData.name}
+            InputProps={{
+              readOnly: true,
+            }}
+            sx={{ marginBottom: "10px" }}
           />
           <Controller
             name="address"
@@ -139,20 +129,14 @@ const CheckoutPage: React.FC = () => {
               />
             )}
           />
-          <Controller
-            name="phone"
-            control={control}
-            defaultValue=""
-            render={({ field }) => (
-              <TextField
-                {...field}
-                fullWidth
-                label="Phone"
-                error={!!errors.phone}
-                helperText={errors.phone ? errors.phone.message : ""}
-                sx={{ marginBottom: "20px" }}
-              />
-            )}
+          <TextField
+            fullWidth
+            label="Phone"
+            value={userData.phone}
+            InputProps={{
+              readOnly: true,
+            }}
+            sx={{ marginBottom: "20px" }}
           />
         </Box>
 

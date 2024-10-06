@@ -20,8 +20,10 @@ import MenuIcon from "@mui/icons-material/Menu";
 import AccountMenu from "./AccountMenu"; // ایمپورت کامپوننت جدید
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useCart } from "../context/CartContext";
+import { useAuth } from '@/context/AuthContext';
 
 const NavBar: React.FC = () => {
+  const { isAuthenticated } = useAuth(); // دسترسی به وضعیت ورود کاربر
   const isMobile = useMediaQuery("(max-width: 600px)");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { cart } = useCart();
@@ -34,7 +36,7 @@ const NavBar: React.FC = () => {
     <AppBar
       position="fixed"
       sx={{
-        backgroundColor: "rgba(30, 30, 31, 0.9)",
+        backgroundColor: "rgba(199, 199, 199, 0.336)",
         padding: "0 20px",
         marginTop: "15px",
         fontFamily: "Roboto, sans-serif",
@@ -55,7 +57,7 @@ const NavBar: React.FC = () => {
             color="inherit"
             onClick={toggleDrawer(!drawerOpen)}
           >
-            <MenuIcon />
+            <MenuIcon  sx={{ color: "#000" }} />
           </IconButton>
         )}
 
@@ -72,7 +74,7 @@ const NavBar: React.FC = () => {
               <Image
                 src="/Logo.png"
                 alt="Logo"
-                width={150}
+                width={200}
                 height={60}
                 priority={true}
               />
@@ -87,13 +89,13 @@ const NavBar: React.FC = () => {
               justifyContent: "center",
               gap: "20px",
               fontSize: "16px",
-              color: "#fff",
+              color: "#000000",
             }}
           >
             <Link href="/products" passHref>
               <Button
                 sx={{
-                  color: "#fff",
+                  color: "#000000",
                   "&:hover": {
                     borderBottom: "2px solid #3f51b5",
                     transition: "border-bottom 0.3s ease",
@@ -106,7 +108,7 @@ const NavBar: React.FC = () => {
             <Link href="/products" passHref>
               <Button
                 sx={{
-                  color: "#fff",
+                  color: "#000000",
                   "&:hover": {
                     borderBottom: "2px solid #3f51b5",
                     transition: "border-bottom 0.3s ease",
@@ -120,7 +122,7 @@ const NavBar: React.FC = () => {
             <Link href="/products" passHref>
               <Button
                 sx={{
-                  color: "#fff",
+                  color: "#000000",
                   "&:hover": {
                     borderBottom: "2px solid #3f51b5",
                     transition: "border-bottom 0.3s ease",
@@ -141,7 +143,7 @@ const NavBar: React.FC = () => {
             alignItems: "center",
           }}
         >
-          <AccountMenu />
+          <AccountMenu /> {/* کامپوننت برای نمایش وضعیت ورود/خروج */}
           <IconButton
             color="inherit"
             sx={{ marginLeft: "40px", position: "relative" }}
@@ -152,7 +154,7 @@ const NavBar: React.FC = () => {
                 color="error"
                 overlap="circular"
               >
-                <ShoppingCartIcon sx={{ fontSize: 32 }} />
+                <ShoppingCartIcon sx={{ fontSize: 32, color: "#000" }} />
               </Badge>
             </Link>
           </IconButton>
@@ -165,21 +167,22 @@ const NavBar: React.FC = () => {
           open={drawerOpen}
           onClose={toggleDrawer(false)}
           PaperProps={{
-            sx: { backgroundColor: "#1f1f1f", marginTop: "64px" },
+            sx: { backgroundColor: "rgba(199, 199, 199, 0.336", marginTop: "64px" },
+ 
           }}
         >
           <List>
             <ListItem component="a" href="/products">
-              <ListItemText primary="New Arrivals" sx={{ color: "#fff" }} />
+              <ListItemText primary="New Arrivals" sx={{ color: "#000000" }} />
             </ListItem>
             <ListItem component="a" href="/products">
-              <ListItemText primary="Collections" sx={{ color: "#fff" }} />
+              <ListItemText primary="Collections" sx={{ color: "#000000" }} />
             </ListItem>
             <ListItem component="a" href="/products">
-              <ListItemText primary="Shop" sx={{ color: "#fff" }} />
+              <ListItemText primary="Shop" sx={{ color: "#000000" }} />
             </ListItem>
             <ListItem component="a" href="/cart">
-              <ListItemText primary="View Cart" sx={{ color: "#fff" }} />
+              <ListItemText primary="View Cart" sx={{ color: "#000000" }} />
             </ListItem>
           </List>
         </Drawer>

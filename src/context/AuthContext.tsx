@@ -13,6 +13,24 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(TokenService.getToken());
 
+  // استفاده از useEffect برای شنیدن تغییرات در localStorage و به‌روزرسانی وضعیت
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const storedToken = TokenService.getToken();
+      if (storedToken !== token) {
+        setToken(storedToken);
+      }
+    };
+
+    // گوش‌دادن به تغییرات در localStorage
+    window.addEventListener('storage', handleStorageChange);
+
+    // پاک‌سازی event listener زمانی که کامپوننت حذف می‌شود
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [token]);
+
   const login = (newToken: string) => {
     TokenService.setToken(newToken);
     setToken(newToken);

@@ -14,7 +14,6 @@ import styles from '@/app/login/Login.module.css';
 
 const Login: React.FC = () => {
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginFormInputs>();
-  
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const router = useRouter();  // استفاده از روش جدید برای ریدایرکت
@@ -42,7 +41,7 @@ const Login: React.FC = () => {
       setSuccessMessage('Login successful!');
       setErrorMessage(null);
 
-      // ریدایرکت به صفحه محصولات
+      // ریدایرکت به صفحه محصولات به جای استفاده از asPath
       router.push('/products');
       
     } catch (error) {
@@ -64,7 +63,6 @@ const Login: React.FC = () => {
               Sign In to your account
             </Typography>
 
-            {/* نمایش پیام‌ها */}
             {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
             {successMessage && <Alert severity="success">{successMessage}</Alert>}
 
