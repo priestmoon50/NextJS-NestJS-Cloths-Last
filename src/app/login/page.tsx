@@ -7,7 +7,9 @@ import { LoginFormInputs } from '@/data/types';
 import PasswordField from '@/app/login/LoginBranches/PasswordField';
 import SubmitButton from '@/app/login/LoginBranches/SubmitButton';
 import LinkButtons from '@/app/login/LoginBranches/LinkButtons';
-import LoginDescription from '@/app/login/LoginBranches/LoginDescription'; 
+import LoginDescription from '@/app/login/LoginBranches/LoginDescription';
+import { useRouter } from 'next/navigation';  // استفاده از روش جدید
+import TokenService from '@/utils/TokenService';  // وارد کردن TokenService
 import styles from '@/app/login/Login.module.css';
 
 const Login: React.FC = () => {
@@ -15,6 +17,7 @@ const Login: React.FC = () => {
   
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const router = useRouter();  // استفاده از روش جدید برای ریدایرکت
 
   const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
     try {
@@ -31,12 +34,17 @@ const Login: React.FC = () => {
       }
 
       const result = await response.json();
+
+      // ذخیره JWT توکن در localStorage با استفاده از TokenService
+      TokenService.setToken(result.access_token);  // ذخیره توکن در localStorage
+      console.log('Token saved in localStorage:', TokenService.getToken());  // بررسی ذخیره JWT
+
       setSuccessMessage('Login successful!');
       setErrorMessage(null);
-      console.log('User logged in successfully:', result);
 
-      // در اینجا می‌توانید کارهایی مثل تغییر روت یا ذخیره JWT توکن انجام دهید
-
+      // ریدایرکت به صفحه محصولات
+      router.push('/products');
+      
     } catch (error) {
       setErrorMessage('Login failed. Please try again.');
       setSuccessMessage(null);

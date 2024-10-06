@@ -1,13 +1,17 @@
 import { Controller, Get, Post, Body, Param, Patch, Delete, UseGuards, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './user.schema';
-import { AuthGuard } from '@nestjs/passport'; // اضافه کردن گارد JWT
+import { AuthGuard } from '@nestjs/passport';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService
+  ) {}
 
   // ایجاد کاربر جدید
   @Post()
@@ -17,12 +21,21 @@ export class UsersController {
 
   // متد ورود
   @Post('login')
-  async login(@Body('phone') phone: string, @Body('password') password: string): Promise<User | string> {
+  async login(@Body('phone') phone: string, @Body('password') password: string): Promise<any> {
     const user = await this.usersService.login(phone, password);
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');  // اگر کاربر پیدا نشد یا رمز عبور اشتباه بود
+      console.log('Invalid login attempt for phone:', phone);
+      throw new UnauthorizedException('Invalid credentials');
     }
-    return user;  // کاربر پیدا شده و معتبر
+
+    const payload = { phone: user.phone, sub: user._id };
+    const access_token = this.jwtService.sign(payload);
+    console.log('JWT generated:', access_token);
+
+    return {
+      message: 'Login successful',
+      access_token,
+    };
   }
 
   // دریافت تمام کاربران (محافظت‌شده)

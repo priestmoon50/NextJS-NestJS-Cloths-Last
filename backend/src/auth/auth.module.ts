@@ -3,22 +3,25 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { UsersModule } from '../users/users.module'; 
+import { UsersModule } from '../users/users.module';
 import { JwtStrategy } from './jwt.strategy';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
-    forwardRef(() => UsersModule), // استفاده از forwardRef برای جلوگیری از وابستگی‌های چرخشی
-    PassportModule.register({ defaultStrategy: 'jwt' }), 
-    JwtModule.register({
-      secret: process.env.JWT_SECRET || 'defaultSecretKey', // استفاده از متغیر محیطی برای کلید امنیتی
-      signOptions: { 
-        expiresIn: process.env.JWT_EXPIRES_IN || '1h', // استفاده از متغیر محیطی برای مدت اعتبار توکن
-      },
+    forwardRef(() => UsersModule),
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET') || 'defaultSecretKey',
+        signOptions: { expiresIn: configService.get<string>('JWT_EXPIRES_IN') || '1h' },
+      }),
+      inject: [ConfigService],
     }),
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
-  exports: [AuthService],
+  exports: [AuthService, JwtModule], // JwtModule صادر شود
 })
 export class AuthModule {}

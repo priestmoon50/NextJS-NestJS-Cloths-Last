@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { ConfigModule, ConfigService } from '@nestjs/config';  // اضافه شده
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CartController } from './cart/cart.controller';
@@ -21,21 +22,31 @@ import { GalleryController } from './GalleryController';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),  // اضافه شده: بارگذاری فایل .env
+
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'gallery'),// تغییر مسیر به پوشه گالری
+      rootPath: join(__dirname, '..', 'gallery'),
       serveRoot: '/gallery',
       serveStaticOptions: {
-        index: false, // جلوگیری از جستجوی فایل index.html
+        index: false,
       },
     }),
 
-    MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/nestjs-shop'),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get<string>('MONGODB_URI') || 'mongodb://127.0.0.1:27017/nestjs-shop',
+      }),
+      inject: [ConfigService],
+    }),
+
     MongooseModule.forFeature([
       { name: 'Cart', schema: CartSchema },
       { name: 'Order', schema: OrderSchema },
       { name: 'Product', schema: ProductSchema },
       { name: 'User', schema: UserSchema },
     ]),
+
     AuthModule,
   ],
   controllers: [

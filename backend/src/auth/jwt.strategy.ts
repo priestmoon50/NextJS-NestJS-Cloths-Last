@@ -1,4 +1,3 @@
-// src/auth/jwt.strategy.ts
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
@@ -15,9 +14,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayload) {
-    console.log(payload);
+    console.log('JWT Payload:', payload);  // بررسی payload
     const user = await this.authService.validateUser(payload);
     if (!user) {
+      console.log('Invalid token or user not found');  // بررسی مشکل
       throw new UnauthorizedException('Invalid token or user not found');
     }
     return user; // اینجا می‌توانید اطلاعات خاص کاربر یا فیلتر شده را برگردانید
