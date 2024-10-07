@@ -10,7 +10,7 @@ const UsersPage = React.lazy(() => import('./users/page'));
 const AdminDashboard: React.FC = () => {
   return (
     <Container sx={{ marginTop: '100px' }}> {/* اضافه کردن فاصله 100px از بالا */}
-      <Typography color='white' variant="h3" gutterBottom>
+      <Typography variant="h3" gutterBottom>
         Admin Dashboard
       </Typography>
       <Grid container spacing={3}>

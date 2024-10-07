@@ -17,13 +17,15 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import MenuIcon from "@mui/icons-material/Menu";
-import AccountMenu from "./AccountMenu"; // ایمپورت کامپوننت جدید
+import AccountMenu from "./AccountMenu"; 
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useCart } from "../context/CartContext";
 import { useAuth } from '@/context/AuthContext';
+import { useTranslation } from 'react-i18next'; // اضافه کردن useTranslation
 
 const NavBar: React.FC = () => {
-  const { isAuthenticated } = useAuth(); // دسترسی به وضعیت ورود کاربر
+  const { t } = useTranslation(); // استفاده از hook ترجمه
+  const { isAuthenticated } = useAuth(); 
   const isMobile = useMediaQuery("(max-width: 600px)");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { cart } = useCart();
@@ -57,7 +59,7 @@ const NavBar: React.FC = () => {
             color="inherit"
             onClick={toggleDrawer(!drawerOpen)}
           >
-            <MenuIcon  sx={{ color: "#000" }} />
+            <MenuIcon sx={{ color: "#000" }} />
           </IconButton>
         )}
 
@@ -102,7 +104,7 @@ const NavBar: React.FC = () => {
                   },
                 }}
               >
-                New Arrivals
+                {t('newArrivals')} {/* استفاده از ترجمه */}
               </Button>
             </Link>
             <Link href="/products" passHref>
@@ -115,7 +117,7 @@ const NavBar: React.FC = () => {
                   },
                 }}
               >
-                Sale
+                {t('sale')} {/* استفاده از ترجمه */}
               </Button>
             </Link>
 
@@ -129,7 +131,7 @@ const NavBar: React.FC = () => {
                   },
                 }}
               >
-                Shop
+                {t('shop')} {/* استفاده از ترجمه */}
               </Button>
             </Link>
           </Box>
@@ -143,7 +145,7 @@ const NavBar: React.FC = () => {
             alignItems: "center",
           }}
         >
-          <AccountMenu /> {/* کامپوننت برای نمایش وضعیت ورود/خروج */}
+          <AccountMenu />
           <IconButton
             color="inherit"
             sx={{ marginLeft: "40px", position: "relative" }}
@@ -167,22 +169,21 @@ const NavBar: React.FC = () => {
           open={drawerOpen}
           onClose={toggleDrawer(false)}
           PaperProps={{
-            sx: { backgroundColor: "rgba(199, 199, 199, 0.336", marginTop: "64px" },
- 
+            sx: { backgroundColor: "rgba(199, 199, 199, 0.336)", marginTop: "64px" },
           }}
         >
           <List>
             <ListItem component="a" href="/products">
-              <ListItemText primary="New Arrivals" sx={{ color: "#000000" }} />
+              <ListItemText primary={t('newArrivals')} sx={{ color: "#000000" }} />
             </ListItem>
             <ListItem component="a" href="/products">
-              <ListItemText primary="Collections" sx={{ color: "#000000" }} />
+              <ListItemText primary={t('collections')} sx={{ color: "#000000" }} />
             </ListItem>
             <ListItem component="a" href="/products">
-              <ListItemText primary="Shop" sx={{ color: "#000000" }} />
+              <ListItemText primary={t('shop')} sx={{ color: "#000000" }} />
             </ListItem>
             <ListItem component="a" href="/cart">
-              <ListItemText primary="View Cart" sx={{ color: "#000000" }} />
+              <ListItemText primary={t('viewCart')} sx={{ color: "#000000" }} />
             </ListItem>
           </List>
         </Drawer>

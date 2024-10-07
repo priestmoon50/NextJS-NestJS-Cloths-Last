@@ -1,34 +1,30 @@
 'use client';
 
 import React from "react";
-import {
-  Box,
-  Typography,
-  Button,
-  List,
-  ListItem,
-  ListItemText,
-} from "@mui/material";
+import { Box, Typography, Button, List, ListItem, ListItemText } from "@mui/material";
 import { useCart } from "../context/CartContext";
 import Link from "next/link";
+import { useTranslation } from "react-i18next";  // اضافه کردن i18n برای ترجمه
 import styles from "./Cart.module.css";
+import { CartItem } from "@/data/types"; // استفاده از تایپ CartItem
 
 const Cart: React.FC = () => {
   const { cart, removeItem, updateItem } = useCart();
+  const { t } = useTranslation();  // استفاده از hook ترجمه
 
   return (
     <Box className={styles.cartContainer}>
       <Typography variant="h4" gutterBottom className={styles.cartTitle}>
-        Your Shopping Cart
+        {t('shoppingCart')} {/* ترجمه برای عنوان "Your Shopping Cart" */}
       </Typography>
       {cart.items.length === 0 ? (
         <Typography variant="h6" className={styles.emptyCartMessage}>
-          Your cart is currently empty.
+          {t('emptyCart')} {/* ترجمه برای پیام "Your cart is currently empty" */}
         </Typography>
       ) : (
         <>
           <List className={styles.cartList}>
-            {cart.items.map((item) => (
+            {cart.items.map((item: CartItem) => ( // استفاده از تایپ CartItem برای آیتم‌های سبد خرید
               <ListItem key={item.id} className={styles.cartListItem}>
                 <ListItemText
                   primary={
@@ -39,19 +35,19 @@ const Cart: React.FC = () => {
                 />
                 <Box className={styles.itemDetailsList}>
                   <Typography className={styles.productDetail}>
-                    <span className={styles.productDetailLabel}>Price:</span>
+                    <span className={styles.productDetailLabel}>{t('price')}:</span>
                     <span className={styles.productDetailValue}>${item.price}</span>
                   </Typography>
                   <Typography className={styles.productDetail}>
-                    <span className={styles.productDetailLabel}>Quantity:</span>
+                    <span className={styles.productDetailLabel}>{t('quantity')}:</span>
                     <span className={styles.productDetailValue}>{item.quantity}</span>
                   </Typography>
                   <Typography className={styles.productDetail}>
-                    <span className={styles.productDetailLabel}>Size:</span>
+                    <span className={styles.productDetailLabel}>{t('size')}:</span>
                     <span className={styles.productDetailValue}>{item.size || "N/A"}</span>
                   </Typography>
                   <Typography className={styles.productDetail}>
-                    <span className={styles.productDetailLabel}>Color:</span>
+                    <span className={styles.productDetailLabel}>{t('color')}:</span>
                     <span className={styles.productDetailValue}>{item.color || "N/A"}</span>
                   </Typography>
                 </Box>
@@ -83,7 +79,7 @@ const Cart: React.FC = () => {
                     onClick={() => removeItem(item.id)}
                     className={styles.removeButton}
                   >
-                    Remove
+                    {t('remove')} {/* ترجمه برای دکمه "Remove" */}
                   </Button>
                 </Box>
               </ListItem>
@@ -93,7 +89,7 @@ const Cart: React.FC = () => {
           <Box className={styles.checkoutContainer}>
             <Link href="/checkout" passHref>
               <Button variant="contained" color="primary" className={styles.checkoutButton}>
-                Proceed to Checkout
+                {t('proceedToCheckout')} {/* ترجمه برای دکمه "Proceed to Checkout" */}
               </Button>
             </Link>
           </Box>

@@ -28,8 +28,8 @@ export interface CartItem {
   name: string;
   price: number;
   quantity: number;
-  size?: string;
-  color?: string;
+  size?: string | number;  // تغییر نوع به string | number
+  color?: string | number; // تغییر نوع به string | number
   image?: string;
 }
 

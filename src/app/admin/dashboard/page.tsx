@@ -20,7 +20,7 @@ const AdminDashboardPage: React.FC = () => {
 
   return (
     <Container sx={{ marginTop: '100px' }}>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h4"  gutterBottom>
         Admin Dashboard
       </Typography>
       <Dashboard

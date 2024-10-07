@@ -1,21 +1,23 @@
-'use client';  // اطمینان حاصل کنید که کامپوننت کلاینتی است
+'use client';
 
 import { Box, Grid, Typography } from '@mui/material';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';  // از next/navigation استفاده کنید
+import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';  // اضافه کردن i18n
 
 const categories = [
-  { id: 1, title: 'Accessory', image: '/images/Accessory.webp', filter: 'pants' },
-  { id: 2, title: 'Dresses', image: '/images/piran.webp', filter: 'dresses' },
-  { id: 3, title: 'Shoes', image: '/images/shos.webp', filter: 'jackets' },
-  { id: 4, title: 'Pants', image: '/images/shalvar.webp', filter: 'footwear' },
+  { id: 1, title: 'accessory', image: '/images/Accessory.webp', filter: 'pants' },
+  { id: 2, title: 'dress', image: '/images/piran.webp', filter: 'dress' },
+  { id: 3, title: 'shoes', image: '/images/shos.webp', filter: 'jackets' },
+  { id: 4, title: 'pants', image: '/images/shalvar.webp', filter: 'footwear' },
 ];
 
-
 export default function CategoryLinks() {
+  const { t } = useTranslation();  // استفاده از hook ترجمه
   const router = useRouter();
+
   const handleCategoryClick = (filter: string) => {
-    router.push(`/products?category=${filter}`);  // هدایت به صفحه فیلتر شده
+    router.push(`/products?category=${filter}`);
   };
 
   return (
@@ -29,21 +31,21 @@ export default function CategoryLinks() {
                 cursor: 'pointer',
                 position: 'relative',
                 height: '300px',
-                background: "cover",
+                background: 'cover',
                 overflow: 'hidden',
                 borderRadius: '12px',
                 boxShadow: '0px 2px 12px rgba(0, 221, 250, 0.637)',
-                border: '1px solid rgba(11, 14, 209, 0.829)', // اضافه کردن حاشیه به دور تصویر
-                transition: 'transform 0.3s ease', // برای جلوه hover
+                border: '1px solid rgba(11, 14, 209, 0.829)', 
+                transition: 'transform 0.3s ease',
                 '&:hover': {
-                  transform: 'scale(1.05)', // تغییر سایز در حالت hover
+                  transform: 'scale(1.05)',
                   boxShadow: '0px 8px 16px rgba(0, 0, 0, 0.2)',
                 },
               }}
             >
               <Image
                 src={category.image}
-                alt={category.title}
+                alt={t(category.title)}  // استفاده از ترجمه برای عنوان‌ها
                 fill
                 style={{ objectFit: 'cover' }}
               />
@@ -58,7 +60,9 @@ export default function CategoryLinks() {
                   py: 1,
                 }}
               >
-                <Typography variant="h6">{category.title}</Typography>
+                <Typography variant="h6">
+                  {t(category.title)}  {/* استفاده از ترجمه */}
+                </Typography>
               </Box>
             </Box>
           </Grid>

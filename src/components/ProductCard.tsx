@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
@@ -10,6 +10,8 @@ import { Product, CartItem } from '@/data/types';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
+import { useTranslation } from 'react-i18next';  // اضافه کردن i18next
+import { MenuItem, Select, InputLabel, FormControl } from '@mui/material'; // برای انتخاب سایز و رنگ
 
 const ProductCard: React.FC<Product> = ({
   id,
@@ -17,18 +19,29 @@ const ProductCard: React.FC<Product> = ({
   name,
   price,
   discount,
+  sizes,
+  colors, // اضافه کردن سایز و رنگ
 }) => {
+  const { t } = useTranslation();  // استفاده از hook ترجمه
   const { addItem, updateItem, cart } = useCart();
-
+  
   // محاسبه قیمت تخفیف‌خورده
   const discountedPrice = discount ? price - (price * discount) / 100 : null;
-
-  // دریافت آرایه تصاویر
   const imagesArray = images ? images : [];
+
+  // استیت‌ها برای ذخیره سایز و رنگ انتخاب‌شده توسط کاربر
+  const [selectedSize, setSelectedSize] = useState<string | number>('');
+  const [selectedColor, setSelectedColor] = useState<string | number>('');
 
   const itemInCart = cart.items.find((item: CartItem) => item.id === id.toString());
 
+  // افزودن محصول به سبد خرید با سایز و رنگ انتخاب‌شده
   const handleAddToCart = () => {
+    if (!selectedSize || !selectedColor) {
+      alert(t('pleaseSelectSizeAndColor'));  // هشدار برای انتخاب سایز و رنگ
+      return;
+    }
+  
     if (itemInCart) {
       updateItem(id.toString(), itemInCart.quantity + 1);
     } else {
@@ -37,11 +50,12 @@ const ProductCard: React.FC<Product> = ({
         name,
         price: discountedPrice || price,
         quantity: 1,
-        size: 'N/A',
-        color: 'N/A',
+        size: String(selectedSize),  // تبدیل به string
+        color: String(selectedColor), // تبدیل به string
       });
     }
   };
+  
 
   return (
     <motion.div
@@ -51,15 +65,16 @@ const ProductCard: React.FC<Product> = ({
       transition={{ duration: 0.5 }}
       whileHover={{ scale: 1.05 }}
     >
-      <Card sx={{ position: 'relative', overflow: 'hidden' }}>
-        <Image
-          src={imagesArray.length > 0 ? imagesArray[0] : '/placeholder.jpg'}
-          alt={name}
-          width={500}
-          height={300}
-          style={{ width: '100%', height: 'auto' }}
-          priority={true}
-        />
+      <Card sx={{ position: 'relative', overflow: 'hidden', height: '100%' }}>
+        <Box sx={{ width: '100%', height: '300px', position: 'relative' }}>
+          <Image
+            src={imagesArray.length > 0 ? imagesArray[0] : '/placeholder.jpg'}
+            alt={name}
+            layout="fill"
+            objectFit="cover"
+            priority={true}
+          />
+        </Box>
 
         <CardContent>
           <Typography variant="h6" component="div">
@@ -76,7 +91,7 @@ const ProductCard: React.FC<Product> = ({
                     fontSize: { xs: '1rem', sm: '0.875rem' },
                   }}
                 >
-                  ${price}
+                  {t('price')}: ${price}
                 </Typography>
                 <Typography
                   variant="body2"
@@ -85,15 +100,45 @@ const ProductCard: React.FC<Product> = ({
                     fontSize: { xs: '1.25rem', sm: '1rem' },
                   }}
                 >
-                  ${discountedPrice}
+                  {t('discountedPrice')}: ${discountedPrice}
                 </Typography>
               </>
             ) : (
               <Typography variant="body2" color="text.secondary">
-                ${price}
+                {t('price')}: ${price}
               </Typography>
             )}
           </Box>
+
+          {/* انتخاب سایز */}
+          <FormControl fullWidth sx={{ mt: 2 }}>
+            <InputLabel>{t('size')}</InputLabel>
+            <Select
+              value={selectedSize}
+              onChange={(e) => setSelectedSize(e.target.value)}
+            >
+              {Array.isArray(sizes) && sizes.map((size) => (
+                <MenuItem key={size} value={size}>
+                  {size}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          {/* انتخاب رنگ */}
+          <FormControl fullWidth sx={{ mt: 2 }}>
+            <InputLabel>{t('color')}</InputLabel>
+            <Select
+              value={selectedColor}
+              onChange={(e) => setSelectedColor(e.target.value)}
+            >
+              {Array.isArray(colors) && colors.map((color) => (
+                <MenuItem key={color} value={color}>
+                  {color}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
           <Grid container spacing={2} sx={{ mt: 2 }}>
             <Grid item xs={12} sm={6}>
@@ -108,7 +153,7 @@ const ProductCard: React.FC<Product> = ({
                     borderRadius: '4px',
                   }}
                 >
-                  View Details
+                  {t('viewDetails')}
                 </Button>
               </Link>
             </Grid>
@@ -124,7 +169,7 @@ const ProductCard: React.FC<Product> = ({
                   borderRadius: '4px',
                 }}
               >
-                Add to Cart
+                {t('addToCart')}
               </Button>
             </Grid>
           </Grid>
