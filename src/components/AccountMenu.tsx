@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Button, Menu, MenuItem, Box, Divider } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
@@ -8,31 +8,30 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import SupportIcon from "@mui/icons-material/HelpOutline";
 import ShopIcon from "@mui/icons-material/ShoppingBag";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import Image from "next/image";
 import Link from "next/link";
-import { useAuth } from "@/context/AuthContext"; // استفاده از useAuth برای دسترسی به متدهای ورود و خروج
-import { useRouter } from "next/navigation"; // برای ریدایرکت
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 import styles from "./AccountMenu.module.css";
 
 const AccountMenu: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const { logout, isAuthenticated } = useAuth(); // دسترسی به وضعیت ورود و متد logout
-  const router = useRouter(); // برای ریدایرکت
+  const { logout, isAuthenticated } = useAuth();
+  const router = useRouter();
 
-  // مدیریت باز و بسته شدن منو
-  const handleMouseEnter = (event: React.MouseEvent<HTMLElement>) => {
+  // مدیریت باز و بسته شدن منو با استفاده از useCallback
+  const handleMouseEnter = useCallback((event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
-  };
+  }, []);
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = useCallback(() => {
     setAnchorEl(null);
-  };
+  }, []);
 
-  // متد خروج
-  const handleLogout = () => {
-    logout(); // حذف توکن و خروج کاربر
-    router.push("/auth/phone-verification"); // ریدایرکت به صفحه Phone Verification برای ورود مجدد
-  };
+  // متد خروج با استفاده از useCallback
+  const handleLogout = useCallback(() => {
+    logout();
+    router.push("/auth/phone-verification");
+  }, [logout, router]);
 
   return (
     <Box
@@ -58,71 +57,64 @@ const AccountMenu: React.FC = () => {
       </Button>
 
       <Menu
-        id="account-menu"
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleMouseLeave}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "center",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "center",
-        }}
-        MenuListProps={{
-          "aria-labelledby": "account-button",
-        }}
-        PaperProps={{
-          className: styles.menuPaper,
-        }}
-      >
-        {!isAuthenticated ? (
-          <>
-            {/* تغییر مسیرهای Log In و Sign Up به صفحه Phone Verification */}
-            <Link href="/auth/phone-verification" passHref>
-              <MenuItem onClick={handleMouseLeave} className={styles.logInButton}>
-                <Image
-                  src="/IconLogin.png"
-                  alt="Login Icon"
-                  width={32}
-                  height={32}
-                  style={{ marginRight: "0.5px", marginTop: "5px", alignSelf: "center" }}
-                />
-                Log In
-              </MenuItem>
-            </Link>
-            <Link href="/auth/phone-verification" passHref>
-              <MenuItem onClick={handleMouseLeave} className={styles.menuItemHover}>
-                <PersonAddIcon sx={{ marginRight: "10px" }} />
-                Sign Up
-              </MenuItem>
-            </Link>
-          </>
-        ) : (
-          <>
-            <MenuItem onClick={handleLogout} className={styles.menuItemHover}>
-              <AccountCircleIcon sx={{ marginRight: "10px" }} />
-              Logout
-            </MenuItem>
-          </>
-        )}
+  id="account-menu"
+  anchorEl={anchorEl}
+  open={Boolean(anchorEl)}
+  onClose={handleMouseLeave}
+  anchorOrigin={{
+    vertical: "bottom",
+    horizontal: "center",
+  }}
+  transformOrigin={{
+    vertical: "top",
+    horizontal: "center",
+  }}
+  MenuListProps={{
+    "aria-labelledby": "account-button",
+  }}
+  PaperProps={{
+    className: styles.menuPaper,
+  }}
+>
+  {!isAuthenticated ? (
+    <div> {/* به جای <>...</> از <div>...</div> استفاده کنید */}
+      <Link href="/auth/phone-verification" passHref>
+        <MenuItem onClick={handleMouseLeave} className={styles.logInButton}>
+          Log In
+        </MenuItem>
+      </Link>
+      <Link href="/auth/phone-verification" passHref>
+        <MenuItem onClick={handleMouseLeave} className={styles.menuItemHover}>
+          <PersonAddIcon sx={{ marginRight: "10px" }} />
+          Sign Up
+        </MenuItem>
+      </Link>
+    </div>
+  ) : (
+    <div> {/* اینجا هم به جای Fragment از <div> استفاده کنید */}
+      <MenuItem onClick={handleLogout} className={styles.menuItemHover}>
+        <AccountCircleIcon sx={{ marginRight: "10px" }} />
+        Logout
+      </MenuItem>
+    </div>
+  )}
+  <Divider className={styles.divider} />
+  <MenuItem onClick={handleMouseLeave} className={styles.menuItemHover}>
+    <SettingsIcon sx={{ marginRight: "10px" }} />
+    Account Settings
+  </MenuItem>
+  <Divider className={styles.divider} />
+  <MenuItem onClick={handleMouseLeave} className={styles.menuItemHover}>
+    <SupportIcon sx={{ marginRight: "10px" }} />
+    Support
+  </MenuItem>
+  <MenuItem onClick={handleMouseLeave} className={styles.menuItemHover}>
+    <ShopIcon sx={{ marginRight: "10px" }} />
+    Shop
+  </MenuItem>
+</Menu>
 
-        <Divider className={styles.divider} />
-        <MenuItem onClick={handleMouseLeave} className={styles.menuItemHover}>
-          <SettingsIcon sx={{ marginRight: "10px" }} />
-          Account Settings
-        </MenuItem>
-        <Divider className={styles.divider} />
-        <MenuItem onClick={handleMouseLeave} className={styles.menuItemHover}>
-          <SupportIcon sx={{ marginRight: "10px" }} />
-          Support
-        </MenuItem>
-        <MenuItem onClick={handleMouseLeave} className={styles.menuItemHover}>
-          <ShopIcon sx={{ marginRight: "10px" }} />
-          Shop
-        </MenuItem>
-      </Menu>
+
     </Box>
   );
 };

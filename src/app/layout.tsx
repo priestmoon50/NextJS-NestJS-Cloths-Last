@@ -8,6 +8,8 @@ import Head from 'next/head';
 import Footer from '@/components/Footer';
 import { CartProvider } from '@/context/CartContext';
 import { AuthProvider } from '@/context/AuthContext'; // وارد کردن AuthProvider
+import LanguageSelector from '@/components/LanguageSelector/LanguageSelector';
+import '../../i18n';
 
 const Layout: React.FC<{ children: React.ReactNode; dehydratedState?: unknown }> = ({ children, dehydratedState }) => {
   const [queryClient] = useState(() => new QueryClient());
@@ -24,6 +26,7 @@ const Layout: React.FC<{ children: React.ReactNode; dehydratedState?: unknown }>
           <HydrationBoundary state={dehydratedState}>
             <AuthProvider>  {/* اضافه کردن AuthProvider */}
               <CartProvider>
+                 <LanguageSelector />
                 <NavBar />
                 <Container sx={{ minWidth: '80%' }}>
                   <Box my={4}>{children}</Box>

@@ -1,0 +1,11 @@
+{
+  "category": "Category",
+  "all": "All",
+  "pants": "Pants",
+  "shoes": "Shoes",
+  "dress": "Dress",
+  "accessory": "Accessory",
+  "priceRange": "Price Range",
+  "currency": "$"
+
+}

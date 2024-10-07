@@ -3,6 +3,7 @@
 
 // تایپ‌های مربوط به محصولات
 export interface Product {
+  [x: string]: any;
   _id: any;
   id: string | number;
   name: string;

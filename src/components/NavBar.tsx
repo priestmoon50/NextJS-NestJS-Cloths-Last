@@ -72,7 +72,7 @@ const NavBar: React.FC = () => {
           <Link href="/" passHref>
             <Box sx={{ cursor: "pointer" }}>
               <Image
-                src="/Logo.png"
+                src="/images/Logo.png"
                 alt="Logo"
                 width={200}
                 height={60}

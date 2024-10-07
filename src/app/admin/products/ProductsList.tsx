@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle , Box} from '@mui/material';
 import { Product } from '@/data/types';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
@@ -73,9 +73,8 @@ const ProductsList: React.FC<ProductsListProps> = ({ onEditProduct }) => {
       headerName: 'Actions',
       width: 250,
       renderCell: (params) => (
-        <>
-
-        {/* به دلیل قرصت ندادن ماها بعدا edit رو درست میکنیم */}
+        <Box>
+          {/* دکمه ویرایش، اگر نیاز است */}
           {/* <Button
             className={styles.actionsButton}
             variant="contained"
@@ -84,8 +83,7 @@ const ProductsList: React.FC<ProductsListProps> = ({ onEditProduct }) => {
           >
             Edit
           </Button> */}
-
-      
+          
           <Button
             variant="contained"
             color="secondary"
@@ -93,8 +91,9 @@ const ProductsList: React.FC<ProductsListProps> = ({ onEditProduct }) => {
           >
             Delete
           </Button>
-        </>
+        </Box>
       ),
+      
     },
   ];
 

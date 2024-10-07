@@ -4,44 +4,46 @@ import { Container, Box, Typography, useMediaQuery, useTheme } from "@mui/materi
 import Image from "next/image";
 import Slider from "react-slick";
 import styles from "./ProductGrid.module.css";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { Product } from "@/data/types";
 
-interface Product {
-  id: number;
-  title: string;
-  image: string;
-  category: string;
-  price: string;
-  status?: "new" | "upcoming";
-}
+// تابع fetch محصولات
+const fetchProducts = async (): Promise<Product[]> => {
+  const { data } = await axios.get("http://localhost:3001/products");
 
-const products: Product[] = [
-  { id: 1, title: "Red Dress", image: "/1.jpg", category: "Dresses", price: "$89.99", status: "new" },
-  { id: 2, title: "Leather Jacket", image: "/2.jpg", category: "Jackets", price: "$129.99", status: "new" },
-  { id: 3, title: "Blue Jeans", image: "/3.jpg", category: "Jeans", price: "$59.99", status: "new" },
-  { id: 4, title: "Black T-Shirt", image: "/4.jpg", category: "T-Shirts", price: "$24.99", status: "new" },
-  { id: 5, title: "White Sneakers", image: "/5.jpg", category: "Footwear", price: "$79.99", status: "upcoming" },
-  { id: 6, title: "Floral Skirt", image: "/6.jpg", category: "Skirts", price: "$49.99" },
-  { id: 7, title: "Wool Sweater", image: "/7.jpg", category: "Sweaters", price: "$69.99" },
-  { id: 8, title: "Summer Hat", image: "/8.jpg", category: "Accessories", price: "$19.99" },
-  { id: 9, title: "Sports Shorts", image: "/9.jpg", category: "Shorts", price: "$29.99" },
-  { id: 10, title: "Classic Watch", image: "/10.jpg", category: "Accessories", price: "$199.99" },
-  { id: 11, title: "Sports test", image: "/11.jpg", category: "Shorts", price: "$292.99" },
-  { id: 12, title: "Classic cloth", image: "/12.jpg", category: "Accessories", price: "$659.99" },
-];
+  // بررسی اینکه آیا API لیستی از محصولات را برمی‌گرداند
+  if (Array.isArray(data)) {
+    return data.map((product: any) => ({
+      ...product,
+      id: product._id, // تبدیل _id به id
+    }));
+  } else {
+    console.error("Error: API did not return an array");
+    return [];
+  }
+};
 
 export default function ProductGrid() {
   const theme = useTheme();
-  
-  // استفاده از Media Query برای تنظیمات اسلایدر
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // برای نسخه‌های موبایل
-  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md')); // برای تبلت‌ها
-  
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
+
+  // استفاده از React Query برای دریافت محصولات
+  const { data: products = [], isLoading, error } = useQuery<Product[], Error>({
+    queryKey: ["products"],
+    queryFn: fetchProducts,
+  });
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error fetching products</div>;
+
   // تنظیمات اسلایدر بر اساس سایز صفحه
   const sliderSettings = {
     dots: true,
     infinite: true,
     speed: 500,
-    slidesToShow: isMobile ? 2 : isTablet ? 3 : 6, // تعداد محصولات بر اساس سایز صفحه
+    slidesToShow: isMobile ? 2 : isTablet ? 3 : 6,
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 3000,
@@ -55,8 +57,8 @@ export default function ProductGrid() {
           <Box key={product.id} className={styles.productCard}>
             <Box sx={{ position: "relative", height: "300px", mb: 2 }}>
               <Image
-                src={product.image}
-                alt={product.title}
+                src={product.images?.[0] || "/placeholder.jpg"} // نمایش اولین تصویر یا placeholder
+                alt={product.name}
                 fill
                 style={{ objectFit: "cover" }}
                 className={styles.productImage}
@@ -68,13 +70,13 @@ export default function ProductGrid() {
               )}
             </Box>
             <Typography variant="h6" component="h3">
-              {product.title}
+              {product.name}
             </Typography>
             <Typography variant="body2" color="textSecondary">
               {product.category}
             </Typography>
             <Typography variant="h6" color="primary">
-              {product.price}
+              ${product.price}
             </Typography>
           </Box>
         ))}

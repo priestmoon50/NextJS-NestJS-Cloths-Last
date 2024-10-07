@@ -5,11 +5,12 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';  // از next/navigation استفاده کنید
 
 const categories = [
-  { id: 1, title: 'Accessory', image: '/Accessory.webp', filter: 'pants' },
-  { id: 2, title: 'Dresses', image: '/piran.webp', filter: 'dresses' },
-  { id: 3, title: 'Shoes', image: '/shos.webp', filter: 'jackets' },
-  { id: 4, title: 'Pants', image: '/shalvar.webp', filter: 'footwear' },
+  { id: 1, title: 'Accessory', image: '/images/Accessory.webp', filter: 'pants' },
+  { id: 2, title: 'Dresses', image: '/images/piran.webp', filter: 'dresses' },
+  { id: 3, title: 'Shoes', image: '/images/shos.webp', filter: 'jackets' },
+  { id: 4, title: 'Pants', image: '/images/shalvar.webp', filter: 'footwear' },
 ];
+
 
 export default function CategoryLinks() {
   const router = useRouter();

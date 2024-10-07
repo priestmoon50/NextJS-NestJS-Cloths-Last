@@ -55,7 +55,7 @@ const CartContext = createContext<CartContextProps | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cart, dispatch] = useReducer(cartReducer, initialState, () => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined') { // بررسی محیط مرورگر
       const localData = localStorage.getItem('cart');
       return localData ? JSON.parse(localData) : initialState;
     }
@@ -63,7 +63,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cart));
+    if (typeof window !== 'undefined') { // بررسی محیط مرورگر
+      localStorage.setItem('cart', JSON.stringify(cart));
+    }
   }, [cart]);
 
   const addItem = (item: CartItem) => {

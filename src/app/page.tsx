@@ -56,12 +56,10 @@ const sliderSettings = {
 };
 
 const images = [
-  "/HomeSlide3.jpg",
-  "/HomeSlide4.jpg",
-  "/HomeSlide5.jpg",
-  "/HomeSlide6.jpg",
-  "/HomeSlide7.jpg",
+  "/images/HomeSlide1.webp",
+  "/images/HomeSlide2.webp",
 ];
+
 
 export default function Home() {
   return (

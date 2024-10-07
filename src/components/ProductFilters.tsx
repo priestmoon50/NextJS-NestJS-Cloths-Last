@@ -1,10 +1,10 @@
-// src/components/ProductFilters.tsx
-
 import React, { useState } from 'react';
 import { Slider, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next'; // اضافه کردن useTranslation
 
 const ProductFilters: React.FC<{ setPriceRange: (range: number[]) => void }> = ({ setPriceRange }) => {
-  const [value, setValue] = useState<number[]>([10, 100]);
+  const { t } = useTranslation(); // استفاده از useTranslation برای ترجمه‌ها
+  const [value, setValue] = useState<number[]>([100, 1000]); // مقدار پیش‌فرض
 
   const handlePriceChange = (event: any, newValue: number | number[]) => {
     setValue(newValue as number[]);
@@ -13,14 +13,15 @@ const ProductFilters: React.FC<{ setPriceRange: (range: number[]) => void }> = (
 
   return (
     <>
-      <Typography>Price Range</Typography>
+      <Typography>{t('priceRange')}</Typography> {/* ترجمه متن "Price Range" */}
       <Slider
         value={value}
         onChange={handlePriceChange}
         valueLabelDisplay="auto"
         min={0}
-        max={200}
+        max={5000} // حداکثر قیمت به 5000 دلار افزایش یافت
       />
+      <Typography>{`${value[0]}${t('currency')} - ${value[1]}${t('currency')}`}</Typography> {/* ترجمه و نمایش واحد پول */}
     </>
   );
 };
