@@ -10,8 +10,8 @@ import { Product, CartItem } from '@/data/types';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
-import { useTranslation } from 'react-i18next';  // اضافه کردن i18next
-import { MenuItem, Select, InputLabel, FormControl } from '@mui/material'; // برای انتخاب سایز و رنگ
+import { useTranslation } from 'react-i18next';
+import Slider from 'react-slick'; // اضافه کردن اسلایدر
 
 const ProductCard: React.FC<Product> = ({
   id,
@@ -20,28 +20,25 @@ const ProductCard: React.FC<Product> = ({
   price,
   discount,
   sizes,
-  colors, // اضافه کردن سایز و رنگ
+  colors,
 }) => {
-  const { t } = useTranslation();  // استفاده از hook ترجمه
+  const { t } = useTranslation();
   const { addItem, updateItem, cart } = useCart();
   
-  // محاسبه قیمت تخفیف‌خورده
   const discountedPrice = discount ? price - (price * discount) / 100 : null;
   const imagesArray = images ? images : [];
 
-  // استیت‌ها برای ذخیره سایز و رنگ انتخاب‌شده توسط کاربر
   const [selectedSize, setSelectedSize] = useState<string | number>('');
   const [selectedColor, setSelectedColor] = useState<string | number>('');
 
   const itemInCart = cart.items.find((item: CartItem) => item.id === id.toString());
 
-  // افزودن محصول به سبد خرید با سایز و رنگ انتخاب‌شده
   const handleAddToCart = () => {
     if (!selectedSize || !selectedColor) {
-      alert(t('pleaseSelectSizeAndColor'));  // هشدار برای انتخاب سایز و رنگ
+      alert(t('pleaseSelectSizeAndColor'));
       return;
     }
-  
+
     if (itemInCart) {
       updateItem(id.toString(), itemInCart.quantity + 1);
     } else {
@@ -50,12 +47,19 @@ const ProductCard: React.FC<Product> = ({
         name,
         price: discountedPrice || price,
         quantity: 1,
-        size: String(selectedSize),  // تبدیل به string
-        color: String(selectedColor), // تبدیل به string
+        size: String(selectedSize),
+        color: String(selectedColor),
       });
     }
   };
-  
+
+  const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+  };
 
   return (
     <motion.div
@@ -67,13 +71,29 @@ const ProductCard: React.FC<Product> = ({
     >
       <Card sx={{ position: 'relative', overflow: 'hidden', height: '100%' }}>
         <Box sx={{ width: '100%', height: '300px', position: 'relative' }}>
-          <Image
-            src={imagesArray.length > 0 ? imagesArray[0] : '/placeholder.jpg'}
-            alt={name}
-            layout="fill"
-            objectFit="cover"
-            priority={true}
-          />
+          {imagesArray.length > 1 ? (
+            <Slider {...sliderSettings}>
+              {imagesArray.map((img, index) => (
+                <Box key={index} sx={{ position: 'relative', width: '100%', height: '300px' }}>
+                  <Image
+                    src={img}
+                    alt={`${name}-${index}`}
+                    layout="fill"
+                    objectFit="cover"
+                    priority={index === 0}
+                  />
+                </Box>
+              ))}
+            </Slider>
+          ) : (
+            <Image
+              src={imagesArray[0] || '/placeholder.jpg'}
+              alt={name}
+              layout="fill"
+              objectFit="cover"
+              priority={true}
+            />
+          )}
         </Box>
 
         <CardContent>
@@ -110,35 +130,46 @@ const ProductCard: React.FC<Product> = ({
             )}
           </Box>
 
-          {/* انتخاب سایز */}
-          <FormControl fullWidth sx={{ mt: 2 }}>
-            <InputLabel>{t('size')}</InputLabel>
-            <Select
-              value={selectedSize}
-              onChange={(e) => setSelectedSize(e.target.value)}
-            >
-              {Array.isArray(sizes) && sizes.map((size) => (
-                <MenuItem key={size} value={size}>
-                  {size}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          {/* انتخاب سایز به صورت دکمه‌های کوچک‌تر */}
+          <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+            {Array.isArray(sizes) && sizes.map((size) => (
+              <Box
+                key={size}
+                onClick={() => setSelectedSize(size)}
+                sx={{
+                  width: '40px',
+                  height: '40px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '50%',
+                  border: selectedSize === size ? '2px solid black' : '1px solid gray',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                }}
+              >
+                {size}
+              </Box>
+            ))}
+          </Box>
 
-          {/* انتخاب رنگ */}
-          <FormControl fullWidth sx={{ mt: 2 }}>
-            <InputLabel>{t('color')}</InputLabel>
-            <Select
-              value={selectedColor}
-              onChange={(e) => setSelectedColor(e.target.value)}
-            >
-              {Array.isArray(colors) && colors.map((color) => (
-                <MenuItem key={color} value={color}>
-                  {color}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          {/* انتخاب رنگ به صورت دایره‌ای */}
+          <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+            {Array.isArray(colors) && colors.map((color) => (
+              <Box
+                key={color}
+                onClick={() => setSelectedColor(color)}
+                sx={{
+                  width: '30px',
+                  height: '30px',
+                  borderRadius: '50%',
+                  backgroundColor: color,
+                  border: selectedColor === color ? '2px solid black' : '1px solid gray',
+                  cursor: 'pointer',
+                }}
+              />
+            ))}
+          </Box>
 
           <Grid container spacing={2} sx={{ mt: 2 }}>
             <Grid item xs={12} sm={6}>

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useState } from 'react';
 
 // Types
 interface CartItem {
@@ -54,19 +54,25 @@ const cartReducer = (state: CartState, action: Action): CartState => {
 const CartContext = createContext<CartContextProps | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [cart, dispatch] = useReducer(cartReducer, initialState, () => {
-    if (typeof window !== 'undefined') { // بررسی محیط مرورگر
+  const [cart, dispatch] = useReducer(cartReducer, initialState);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // فقط پس از بارگذاری کلاینت localStorage را بخوانید
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
       const localData = localStorage.getItem('cart');
-      return localData ? JSON.parse(localData) : initialState;
+      if (localData) {
+        dispatch({ type: 'ADD_ITEM', payload: JSON.parse(localData) });
+      }
     }
-    return initialState;
-  });
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') { // بررسی محیط مرورگر
-      localStorage.setItem('cart', JSON.stringify(cart));
+    if (isMounted && typeof window !== 'undefined') {
+      localStorage.setItem('cart', JSON.stringify(cart.items));
     }
-  }, [cart]);
+  }, [cart, isMounted]);
 
   const addItem = (item: CartItem) => {
     dispatch({ type: 'ADD_ITEM', payload: item });
@@ -79,6 +85,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateItem = (id: string, quantity: number) => {
     dispatch({ type: 'UPDATE_ITEM', payload: { id, quantity } });
   };
+
+  if (!isMounted) {
+    return null; // جلوگیری از رندر تا زمان بارگذاری کامل
+  }
 
   return (
     <CartContext.Provider value={{ cart, addItem, removeItem, updateItem }}>

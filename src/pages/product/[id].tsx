@@ -1,13 +1,34 @@
 import Layout from '@/app/layout';
 import ProductDetails from '@/components/ProductDetails/ProductDetails';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, NextPage } from 'next';
 import { Product } from '@/data/types';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 
 interface ProductPageProps {
-  product: Product;
+  product: Product | null;
 }
 
-const ProductPage: React.FC<ProductPageProps> = ({ product }) => {
+const ProductPage: NextPage<ProductPageProps> = ({ product }) => {
+  const [isMounted, setIsMounted] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // If product is null or not found, redirect to a 404 page
+  if (!product) {
+    if (typeof window !== 'undefined') {
+      router.push('/404'); // Optional: Custom 404 page
+    }
+    return null;
+  }
+
+  if (!isMounted) {
+    return null; // Prevent hydration issues
+  }
+
   return (
     <Layout>
       <ProductDetails product={product} />
@@ -18,22 +39,32 @@ const ProductPage: React.FC<ProductPageProps> = ({ product }) => {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { id } = context.params as { id: string };
 
-  // Fetch your product from your API
-  const res = await fetch(`http://localhost:3000/api/products/${id}`);
-  
-  if (!res.ok) {
+  try {
+    // Fetch product from API
+    const res = await fetch(`http://localhost:3000/api/products/${id}`);
+
+    // If product not found, return 404
+    if (!res.ok) {
+      return {
+        notFound: true,
+      };
+    }
+
+    const product: Product = await res.json();
+
     return {
-      notFound: true,
+      props: {
+        product,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    return {
+      props: {
+        product: null,
+      },
     };
   }
-
-  const product: Product = await res.json();
-
-  return {
-    props: {
-      product,
-    },
-  };
 };
 
 export default ProductPage;
