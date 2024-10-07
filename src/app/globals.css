@@ -23,6 +23,7 @@ body {
 
 /* استایل‌های عمومی برای متن و رنگ پس‌زمینه */
 body {
+  margin-top: 50px;
   position: relative;
   color: var(--foreground);
   background: var(--background);

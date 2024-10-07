@@ -1,4 +1,3 @@
-// src/admin/products/page.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -9,25 +8,7 @@ import { Product } from "@/data/types";
 import ImageUpload from "./ImageUpload"; // ایمپورت کامپوننت ImageUpload
 
 const ProductsPage: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>([
-    {
-      id: 1,
-      name: "T-Shirt",
-      price: 25.99,
-      image: "/images/tshirt.jpg",
-      category: "Clothing",
-      stock: 50,
-    },
-    {
-      id: 2,
-      name: "Jeans",
-      price: 49.99,
-      image: "/images/jeans.jpg",
-      category: "Clothing",
-      stock: 30,
-    },
-  ]);
-
+  const [products, setProducts] = useState<Product[]>([]); // لیست محصولات بدون داده‌های تستی
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   const handleAddProduct = (product: Product) => {
@@ -53,16 +34,14 @@ const ProductsPage: React.FC = () => {
 
   return (
     <Container sx={{ marginTop: "100px" }}>
-      {" "}
-      {/* اضافه کردن فاصله 100px از بالا */}
       <Typography color="white" variant="h4" gutterBottom>
         Products Management
       </Typography>
       {/* نمایش فرم افزودن/ویرایش محصول */}
       {editingProduct ? (
         <AddProductForm
-          onAddProduct={handleUpdateProduct} // برای ویرایش محصول از این تابع استفاده می‌کنید
-          initialProduct={editingProduct} // محصول انتخاب‌شده برای ویرایش را به فرم ارسال کنید
+          onAddProduct={handleUpdateProduct}
+          initialProduct={editingProduct}
         />
       ) : (
         <AddProductForm onAddProduct={handleAddProduct} />

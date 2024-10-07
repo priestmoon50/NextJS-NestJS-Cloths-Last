@@ -19,10 +19,10 @@ const SignInModal: React.FC<SignInModalProps> = ({ open }) => {
         </DialogContentText>
         <Box sx={{ marginBottom: "20px" }}>
           <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-            If you have an account, please <Link href="/login" style={{ color: "blue", fontWeight: "bold" }}>log in</Link>.
+            If you have an account, please <Link href="/auth/phone-verification" style={{ color: "blue", fontWeight: "bold" }}>log in</Link>.
           </Typography>
           <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-            If you don't have an account, please <Link href="/register" style={{ color: "blue", fontWeight: "bold" }}>register</Link>.
+            If you don't have an account, please <Link href="/auth/phone-verification" style={{ color: "blue", fontWeight: "bold" }}>register</Link>.
           </Typography>
         </Box>
       </DialogContent>

@@ -30,7 +30,7 @@ export class AuthController {
 @Post('register')
 @HttpCode(HttpStatus.CREATED)
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
-async register(@Body() registerDto: { phone: string; username: string; password: string }) {
+async register(@Body() registerDto: RegisterDto) {
   const userExists = await this.authService.findByPhone(registerDto.phone);
   
   if (userExists) {
@@ -45,6 +45,7 @@ async register(@Body() registerDto: { phone: string; username: string; password:
     user: newUser,
   };
 }
+
 
 
   @Post('logout')

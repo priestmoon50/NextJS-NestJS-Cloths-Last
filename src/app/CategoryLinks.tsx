@@ -5,10 +5,10 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';  // از next/navigation استفاده کنید
 
 const categories = [
-  { id: 1, title: 'Accessory', image: '/Saat.jpg', filter: 'pants' },
-  { id: 2, title: 'Dresses', image: '/pirhan.jpg', filter: 'dresses' },
-  { id: 3, title: 'Shoes', image: '/shoesLogo.webp', filter: 'jackets' },
-  { id: 4, title: 'Pants', image: '/shalvar.jpg', filter: 'footwear' },
+  { id: 1, title: 'Accessory', image: '/Accessory.webp', filter: 'pants' },
+  { id: 2, title: 'Dresses', image: '/piran.webp', filter: 'dresses' },
+  { id: 3, title: 'Shoes', image: '/shos.webp', filter: 'jackets' },
+  { id: 4, title: 'Pants', image: '/shalvar.webp', filter: 'footwear' },
 ];
 
 export default function CategoryLinks() {
@@ -27,8 +27,8 @@ export default function CategoryLinks() {
               sx={{
                 cursor: 'pointer',
                 position: 'relative',
-                height: '200px',
-                width: "200",
+                height: '300px',
+                background: "cover",
                 overflow: 'hidden',
                 borderRadius: '12px',
                 boxShadow: '0px 2px 12px rgba(0, 221, 250, 0.637)',

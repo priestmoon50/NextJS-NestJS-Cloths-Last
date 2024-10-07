@@ -1,15 +1,22 @@
 import React, { useState } from "react";
 import { Box, Button, Input, Snackbar, Alert } from "@mui/material";
 import axios from "axios";
+import Image from 'next/image'; // وارد کردن Image از Next.js
 
 const ImageUpload: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null); // برای ذخیره URL پیش‌نمایش
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
-      setSelectedFile(event.target.files[0]);
+      const file = event.target.files[0];
+      setSelectedFile(file);
+
+      // تولید URL برای پیش‌نمایش
+      const fileUrl = URL.createObjectURL(file);
+      setPreviewUrl(fileUrl);
     }
   };
 
@@ -46,16 +53,31 @@ const ImageUpload: React.FC = () => {
   return (
     <Box sx={{ padding: "20px", border: "1px solid #ccc", borderRadius: "8px", backgroundColor: "#f9f9f9" }}>
       <Input type="file" onChange={handleFileChange} />
+      
+      {/* پیش‌نمایش تصویر قبل از ارسال */}
+      {previewUrl && (
+        <Box sx={{ marginTop: "20px" }}>
+          <Image
+            src={previewUrl}
+            alt="Preview"
+            width={300} // تعیین عرض تصویر
+            height={300} // تعیین ارتفاع تصویر
+            objectFit="cover" // نمایش مناسب تصویر
+          />
+        </Box>
+      )}
+      
       <Button 
         onClick={handleUpload} 
         variant="contained" 
         color="primary"
         sx={{ marginTop: "10px" }}
+        disabled={!selectedFile} // غیرفعال کردن دکمه اگر فایلی انتخاب نشده باشد
       >
         Upload Image
       </Button>
 
-      {/* Snackbar for notifications */}
+      {/* Snackbar برای نمایش پیام‌ها */}
       <Snackbar
         open={openSnackbar}
         autoHideDuration={3000}
