@@ -9,12 +9,12 @@ import Footer from '@/components/Footer';
 import { CartProvider } from '@/context/CartContext';
 import { AuthProvider } from '@/context/AuthContext';
 import LanguageSelector from '@/components/LanguageSelector/LanguageSelector';
-import { useTranslation } from 'react-i18next'; // برای ترجمه
+import { useTranslation } from 'react-i18next';
 import '../../i18n';
 
 const Layout: React.FC<{ children: React.ReactNode; dehydratedState?: unknown }> = ({ children, dehydratedState }) => {
   const [queryClient] = useState(() => new QueryClient());
-  const { i18n } = useTranslation(); // دسترسی به زبان فعلی
+  const { i18n } = useTranslation();
 
   return (
     <html lang={i18n.language === 'fa' ? 'fa' : 'en'}>
@@ -28,7 +28,7 @@ const Layout: React.FC<{ children: React.ReactNode; dehydratedState?: unknown }>
           <HydrationBoundary state={dehydratedState}>
             <AuthProvider>
               <CartProvider>
-                <LanguageSelector />
+                <LanguageSelector /> {/* LanguageSelector فقط یک‌بار ظاهر می‌شود */}
                 <NavBar />
                 <Container sx={{ minWidth: '80%' }}>
                   <Box my={4}>{children}</Box>
@@ -44,3 +44,4 @@ const Layout: React.FC<{ children: React.ReactNode; dehydratedState?: unknown }>
 };
 
 export default Layout;
+
