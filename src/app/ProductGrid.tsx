@@ -47,8 +47,11 @@ export default function ProductGrid() {
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 3000,
-    rtl: true,
+    rtl: true, // راست به چپ
+    centerMode: true, // اضافه کردن این گزینه برای وسط‌چین کردن اسلایدر
+    centerPadding: "0", // جلوگیری از padding اضافه در حالت راست‌چین
   };
+
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>

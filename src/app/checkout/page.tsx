@@ -28,7 +28,10 @@ const CheckoutPage: React.FC = () => {
   const { cart, removeItem, updateItem } = useCart();
   const router = useRouter();
   const { isAuthenticated } = useAuth(); 
-  const [userData, setUserData] = useState({ name: "", phone: "" });
+  const [userData, setUserData] = useState({ name: "", phone: "", userId: "" });
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
 
   const {
     handleSubmit,
@@ -38,43 +41,56 @@ const CheckoutPage: React.FC = () => {
     resolver: yupResolver(validationSchema),
   });
 
-  const [openModal, setOpenModal] = useState(false);
-
   // گرفتن اطلاعات کاربر اگر وارد شده باشد
   useEffect(() => {
     const token = TokenService.getToken();
-    console.log("Token from localStorage:", token); // لاگ توکن
+    console.log("Token from localStorage:", token);
     if (token) {
+      setIsLoading(true);
       fetch("/api/users/me", {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${token}`, // استفاده از توکن در هدر
+          Authorization: `Bearer ${token}`,
         },
       })
-        .then((res) => res.json())
-        .then((data) => {
-          console.log("User data from API:", data); // لاگ اطلاعات کاربر از API
-          setUserData({ name: data.name, phone: data.phone });
+        .then((res) => {
+          if (!res.ok) throw new Error("Failed to fetch user data");
+          return res.json();
         })
-        .catch((error) => console.error("Error fetching user data:", error));
+        .then((data) => {
+          console.log("User data from API:", data);
+          setUserData({ name: data.name, phone: data.phone, userId: data.id });
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error fetching user data:", error);
+          setHasError(true);
+          setIsLoading(false);
+        });
     } else {
-      setOpenModal(true); // مودال را باز نگه می‌داریم
+      setOpenModal(true);
     }
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      setOpenModal(false);
+    }
+  }, [isAuthenticated]);
 
   const handlePlaceOrder = async (data: any) => {
     try {
       const orderData = {
-        userId: "USER_ID_HERE", 
+        userId: userData.userId,
         items: cart.items,
         totalPrice: cart.items.reduce((acc, item) => acc + item.price * item.quantity, 0),
-        name: userData.name, 
+        name: userData.name,
         address: data.address,
-        phone: userData.phone, 
+        phone: userData.phone,
         status: 'Pending',
       };
 
-      console.log("Order data being sent to API:", orderData); // لاگ اطلاعات سفارش
+      console.log("Order data being sent to API:", orderData);
 
       const response = await fetch('/api/orders', {
         method: 'POST',
@@ -100,7 +116,7 @@ const CheckoutPage: React.FC = () => {
         Checkout
       </Typography>
 
-      {/* مودال غیرقابل بستن */}
+      {/* مودال ورود */}
       <SignInModal open={openModal} />
 
       <form onSubmit={handleSubmit(handlePlaceOrder)}>
@@ -108,9 +124,9 @@ const CheckoutPage: React.FC = () => {
           <TextField
             fullWidth
             label="Name"
-            value={userData.name}
+            value={userData.name || ""}
             InputProps={{
-              readOnly: true,
+              readOnly: isAuthenticated,
             }}
             sx={{ marginBottom: "10px" }}
           />
@@ -132,9 +148,9 @@ const CheckoutPage: React.FC = () => {
           <TextField
             fullWidth
             label="Phone"
-            value={userData.phone}
+            value={userData.phone || ""}
             InputProps={{
-              readOnly: true,
+              readOnly: isAuthenticated,
             }}
             sx={{ marginBottom: "20px" }}
           />

@@ -1,3 +1,7 @@
+.container {
+  direction: rtl; /* تعیین جهت کلی به راست به چپ */
+}
+
 .productCard {
   backdrop-filter: blur(10px);
   background-color: rgba(255, 255, 255, 0.884);
@@ -7,10 +11,11 @@
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
   padding: 15px;
-  height: 450px; /* تنظیم ارتفاع ثابت برای کارت‌ها */
+  height: 450px;
   display: flex;
-  flex-direction: column; /* محتوای کارت به صورت عمودی مرتب می‌شود */
-  justify-content: space-between; /* محتوای کارت بین بالا و پایین تقسیم می‌شود */
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: center;
   box-sizing: border-box;
   max-width: 100%;
 }
@@ -18,15 +23,15 @@
 .productImage {
   border-radius: 12px;
   object-fit: cover;
-  height: 250px; /* تنظیم ارتفاع ثابت برای تصاویر */
-  width: 100%; /* عرض تصویر برابر با عرض کارت باشد */
+  height: 250px;
+  width: 100%;
 }
 
 .productTitle {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 100%; /* جلوگیری از خارج شدن متن از کادر */
+  max-width: 100%;
 }
 
 .productCategory {
@@ -43,21 +48,17 @@
   font-weight: bold;
   margin-top: auto;
   max-width: 100%;
-  text-align: left;
-  word-wrap: break-word;
 }
-
-
 
 .productStatus {
   position: absolute;
   top: 10px;
   left: 10px;
-  background-color: rgba(0, 123, 255, 0.8); /* رنگ آبی شفاف */
+  background-color: rgba(0, 123, 255, 0.8);
   color: white;
   padding: 4px 8px;
   border-radius: 8px;
   font-size: 12px;
   font-weight: bold;
+  direction: rtl; /* جهت دهی به استایل وضعیت محصول */
 }
-

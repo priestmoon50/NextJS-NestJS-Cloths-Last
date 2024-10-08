@@ -6,8 +6,8 @@ interface CartItem {
   name: string;
   price: number;
   quantity: number;
-  size?: string;
-  color?: string;
+  size?: string | number; 
+  color?: string | number; 
 }
 
 interface CartState {
@@ -28,12 +28,15 @@ const initialState: CartState = {
 
 // Actions
 type Action =
+  | { type: 'SET_ITEMS'; payload: CartItem[] } // اضافه کردن اکشنی برای تنظیم کل آیتم‌ها
   | { type: 'ADD_ITEM'; payload: CartItem }
   | { type: 'REMOVE_ITEM'; payload: string }
   | { type: 'UPDATE_ITEM'; payload: { id: string; quantity: number } };
 
 const cartReducer = (state: CartState, action: Action): CartState => {
   switch (action.type) {
+    case 'SET_ITEMS': // تنظیم کل آیتم‌ها
+      return { ...state, items: action.payload };
     case 'ADD_ITEM':
       return { ...state, items: [...state.items, action.payload] };
     case 'REMOVE_ITEM':
@@ -62,7 +65,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (typeof window !== 'undefined') {
       const localData = localStorage.getItem('cart');
       if (localData) {
-        dispatch({ type: 'ADD_ITEM', payload: JSON.parse(localData) });
+        dispatch({ type: 'SET_ITEMS', payload: JSON.parse(localData) }); // بازیابی کل آیتم‌ها
       }
     }
     setIsMounted(true);
@@ -70,9 +73,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     if (isMounted && typeof window !== 'undefined') {
-      localStorage.setItem('cart', JSON.stringify(cart.items));
+      localStorage.setItem('cart', JSON.stringify(cart.items)); // ذخیره‌سازی فقط آیتم‌ها
     }
-  }, [cart, isMounted]);
+  }, [cart.items, isMounted]); // فقط زمانی که آیتم‌ها تغییر می‌کنند، ذخیره‌سازی انجام می‌شود
 
   const addItem = (item: CartItem) => {
     dispatch({ type: 'ADD_ITEM', payload: item });

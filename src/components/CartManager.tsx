@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
+import { useTranslation } from 'react-i18next'; // اضافه کردن i18n برای ترجمه
+import { Button, TextField, Box, Typography } from '@mui/material';
 
 const CartManager: React.FC = () => {
   const { cart, addItem, removeItem, updateItem } = useCart();
+  const { t } = useTranslation(); // استفاده از ترجمه
   const [newItem, setNewItem] = useState({
     id: '',
     name: '',
@@ -11,77 +14,72 @@ const CartManager: React.FC = () => {
     size: '',
     color: '',
   });
+  const [error, setError] = useState<string | null>(null); // مدیریت خطا
 
   const handleAddItem = () => {
-    if (newItem.id && newItem.name && newItem.price > 0) {
-      addItem(newItem);
-      setNewItem({ id: '', name: '', price: 0, quantity: 1, size: '', color: '' });
+    if (!newItem.id || !newItem.name || newItem.price <= 0) {
+      setError(t('error.requiredFields')); // نمایش پیام خطا
+      return;
     }
+
+    addItem(newItem);
+    setNewItem({ id: '', name: '', price: 0, quantity: 1, size: '', color: '' });
+    setError(null); // پاک کردن خطا پس از موفقیت
   };
 
   return (
     <div>
-      <h2>Cart Manager</h2>
-      <div>
-        <input
-          type="text"
-          placeholder="Product ID"
+      <Typography variant="h4">{t('cartManagerTitle')}</Typography>
+      <Box>
+        <TextField
+          label={t('productId')}
           value={newItem.id}
           onChange={(e) => setNewItem({ ...newItem, id: e.target.value })}
         />
-        <input
-          type="text"
-          placeholder="Product Name"
+        <TextField
+          label={t('productName')}
           value={newItem.name}
           onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
         />
-        <input
+        <TextField
+          label={t('price')}
           type="number"
-          placeholder="Price"
           value={newItem.price}
           onChange={(e) => setNewItem({ ...newItem, price: Number(e.target.value) })}
         />
-        <input
+        <TextField
+          label={t('quantity')}
           type="number"
-          placeholder="Quantity"
           value={newItem.quantity}
           onChange={(e) => setNewItem({ ...newItem, quantity: Number(e.target.value) })}
         />
-        <input
-          type="text"
-          placeholder="Size"
+        <TextField
+          label={t('size')}
           value={newItem.size}
           onChange={(e) => setNewItem({ ...newItem, size: e.target.value })}
         />
-        <input
-          type="text"
-          placeholder="Color"
+        <TextField
+          label={t('color')}
           value={newItem.color}
           onChange={(e) => setNewItem({ ...newItem, color: e.target.value })}
         />
-        <button onClick={handleAddItem}>Add Item</button>
-      </div>
+        <Button variant="contained" color="primary" onClick={handleAddItem}>
+          {t('addItem')}
+        </Button>
+      </Box>
 
-      <h3>Cart Items</h3>
+      {error && <Typography color="error">{error}</Typography>} {/* نمایش خطا */}
+
+      <Typography variant="h5">{t('cartItems')}</Typography>
       <ul>
         {cart.items.map((item) => (
           <li key={item.id}>
             {item.name} - ${item.price} x {item.quantity} ({item.size}, {item.color})
-            <button onClick={() => removeItem(item.id)}>Remove</button>
-            <button
-              onClick={() =>
-                updateItem(item.id, item.quantity + 1)
-              }
-            >
-              Increase Quantity
-            </button>
-            <button
-              onClick={() =>
-                updateItem(item.id, item.quantity > 1 ? item.quantity - 1 : 1)
-              }
-            >
-              Decrease Quantity
-            </button>
+            <Button onClick={() => removeItem(item.id)}>{t('remove')}</Button>
+            <Button onClick={() => updateItem(item.id, item.quantity + 1)}>{t('increase')}</Button>
+            <Button onClick={() => updateItem(item.id, item.quantity > 1 ? item.quantity - 1 : 1)}>
+              {t('decrease')}
+            </Button>
           </li>
         ))}
       </ul>
