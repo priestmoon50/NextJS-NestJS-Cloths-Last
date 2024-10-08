@@ -26,6 +26,9 @@ export class Product extends Document {
 
   @Prop({ type: [String], default: [] }) // اضافه کردن آرایه‌ای از URL تصاویر
   images: string[];
+
+  @Prop({ type: [String], default: [] }) // اضافه کردن فیلد راهنمای اندازه
+  sizeGuide: string[]; // آرایه‌ای از توضیحات مربوط به اندازه‌ها
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import styles from './PhoneVerification.module.css';
 
+// تنظیم baseURL برای درخواست‌های Axios
+const baseURL = 'http://localhost:3001';
+
 export default function PhoneVerification() {
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
@@ -23,14 +26,17 @@ export default function PhoneVerification() {
       setError('Invalid phone number');
       return;
     }
+    console.log('Sending phone:', phone);  // لاگ شماره تلفن ارسالی
     setLoading(true);
     try {
-      await axios.post('/api/auth/verify-phone', { phone });
+      const response = await axios.post(`${baseURL}/auth/verify-phone`, { phone });  // استفاده از baseURL
+      console.log('Response from sendPhone:', response);  // لاگ پاسخ API
       setIsCodeSent(true);
       setError('');
       setResendEnabled(false); // غیرفعال کردن دکمه ارسال مجدد
       setTimer(60); // شروع تایمر 60 ثانیه‌ای
     } catch (err) {
+      console.error('Error sending verification code:', err);  // لاگ خطا
       setError('Failed to send verification code');
     } finally {
       setLoading(false);
@@ -39,9 +45,11 @@ export default function PhoneVerification() {
 
   // تایید کد ارسال شده
   const verifyCode = async () => {
+    console.log('Verifying code:', { phone, code });  // لاگ کد و شماره تلفن
     setLoading(true);
     try {
-      const res = await axios.post('/api/auth/confirm-code', { phone, code });
+      const res = await axios.post(`${baseURL}/auth/confirm-code`, { phone, code });  // استفاده از baseURL
+      console.log('Response from verifyCode:', res);  // لاگ پاسخ API
       if (res.data.success) {
         localStorage.setItem('token', res.data.accessToken);
         setIsCodeConfirmed(true);
@@ -50,6 +58,7 @@ export default function PhoneVerification() {
         setError(res.data.message);
       }
     } catch (err) {
+      console.error('Error verifying code:', err);  // لاگ خطا
       setError('Failed to verify code');
     } finally {
       setLoading(false);

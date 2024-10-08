@@ -1,10 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { TextField, Button, Box, Typography, Grid, Select, MenuItem } from "@mui/material";
+import {
+  TextField,
+  Button,
+  Box,
+  Typography,
+  Grid,
+  Select,
+  MenuItem,
+} from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { Product } from "@/data/types";
 import axios from "axios";
 import styles from "./AddProductForm.module.css";
-import GalleryImageSelector from './GalleryImageSelector'; // وارد کردن GalleryImageSelector برای انتخاب عکس از گالری
+import GalleryImageSelector from "./GalleryImageSelector"; // وارد کردن GalleryImageSelector برای انتخاب عکس از گالری
 
 interface AddProductFormProps {
   onAddProduct: (product: Product) => void;
@@ -23,20 +31,34 @@ const AddProductForm: React.FC<AddProductFormProps> = ({
       colors: [],
       sizes: [],
       category: "",
-      images: [], // آرایه برای ذخیره URL تصاویر انتخاب‌شده
+      images: [],
+      sizeGuide: "", // فیلد جدید برای سایز
     },
   });
 
   const [addedImages, setAddedImages] = useState<string[]>([]); // ذخیره URL تصاویر انتخاب‌شده
-  const availableSizes = ["S", "M", "L", "XL", "2X Large"];
-  const availableColors = ["Red", "Blue", "Green", "Yellow"];
+  const [customColor, setCustomColor] = useState<string>(""); // ذخیره رنگ دلخواه وارد شده
+  const [customSize, setCustomSize] = useState<string>(""); // ذخیره سایز دلخواه وارد شده
+  const [availableColors, setAvailableColors] = useState<string[]>([
+    "Red",
+    "Blue",
+    "Green",
+    "Yellow",
+  ]); // ذخیره لیست رنگ‌های موجود
+  const [availableSizes, setAvailableSizes] = useState<string[]>([
+    "S",
+    "M",
+    "L",
+    "XL",
+    "2X Large",
+  ]); // ذخیره لیست سایزهای موجود
 
   useEffect(() => {
     if (initialProduct) {
       reset(initialProduct);
     }
   }, [initialProduct, reset]);
-  
+
   // اضافه کردن تصویر انتخاب‌شده به لیست تصاویر محصول
   const handleAddImage = (imageUrl: string) => {
     setAddedImages([...addedImages, imageUrl]);
@@ -47,11 +69,15 @@ const AddProductForm: React.FC<AddProductFormProps> = ({
       const productData = {
         ...data,
         images: addedImages, // اضافه کردن URL تصاویر به داده‌های محصول
+        sizeGuide: data.sizeGuide,
       };
 
       // ارسال داده به بک‌اند به صورت JSON
-      const response = await axios.post("http://localhost:3001/products", productData);
-      
+      const response = await axios.post(
+        "http://localhost:3001/products",
+        productData
+      );
+
       console.log("Product added successfully:", response.data);
       reset();
       setAddedImages([]); // پاک کردن تصاویر انتخاب‌شده بعد از افزودن محصول
@@ -100,16 +126,48 @@ const AddProductForm: React.FC<AddProductFormProps> = ({
             multiple
             value={field.value || []}
             onChange={field.onChange}
-            renderValue={(selected) => (selected as string[]).join(', ')}
+            renderValue={(selected) => (selected as string[]).join(", ")}
           >
             {availableColors.map((color) => (
               <MenuItem key={color} value={color}>
+                <Box
+                  sx={{
+                    display: "inline-block",
+                    width: "20px",
+                    height: "20px",
+                    backgroundColor: color.toLowerCase(),
+                    marginRight: "8px",
+                    borderRadius: "50%",
+                    border: "1px solid #ddd",
+                  }}
+                />
                 {color}
               </MenuItem>
             ))}
           </Select>
         )}
       />
+
+      {/* افزودن رنگ دلخواه */}
+      <TextField
+        label="Add Custom Color"
+        value={customColor}
+        onChange={(e) => setCustomColor(e.target.value)}
+        sx={{ marginTop: "20px" }}
+      />
+      <Button
+        onClick={() => {
+          if (customColor && !availableColors.includes(customColor)) {
+            setAvailableColors([...availableColors, customColor]);
+            setCustomColor("");
+          }
+        }}
+        variant="contained"
+        color="secondary"
+        sx={{ marginTop: "10px", marginBottom: "20px" }}
+      >
+        Add Color
+      </Button>
 
       {/* انتخاب سایزها */}
       <Controller
@@ -121,7 +179,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({
             multiple
             value={field.value || []}
             onChange={field.onChange}
-            renderValue={(selected) => (selected as string[]).join(', ')}
+            renderValue={(selected) => (selected as string[]).join(", ")}
           >
             {availableSizes.map((size) => (
               <MenuItem key={size} value={size}>
@@ -129,6 +187,41 @@ const AddProductForm: React.FC<AddProductFormProps> = ({
               </MenuItem>
             ))}
           </Select>
+        )}
+      />
+
+      {/* افزودن سایز دلخواه */}
+      <TextField
+        label="Add Custom Size"
+        value={customSize}
+        onChange={(e) => setCustomSize(e.target.value)}
+        sx={{ marginTop: "20px" }}
+      />
+      <Button
+        onClick={() => {
+          if (customSize && !availableSizes.includes(customSize)) {
+            setAvailableSizes([...availableSizes, customSize]);
+            setCustomSize("");
+          }
+        }}
+        variant="contained"
+        color="secondary"
+        sx={{ marginTop: "10px", marginBottom: "20px" }}
+      >
+        Add Size
+      </Button>
+
+      <Controller
+        name="sizeGuide"
+        control={control}
+        render={({ field }) => (
+          <TextField
+            {...field}
+            label="Size Guide"
+            multiline
+            rows={4}
+            placeholder="Use a comma ( , ) to separate each line"
+          />
         )}
       />
 
@@ -142,7 +235,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({
       <GalleryImageSelector onAddImage={handleAddImage} />
 
       {/* نمایش تصاویر انتخاب‌شده */}
-      <Box sx={{ marginTop: '20px' }}>
+      <Box sx={{ marginTop: "20px" }}>
         <Typography variant="h6">Selected Images for this Product:</Typography>
         <Grid container spacing={2}>
           {addedImages.map((image, index) => (
@@ -150,7 +243,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({
               <img
                 src={image}
                 alt={`Selected Image ${index}`}
-                style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                style={{ width: "100px", height: "100px", objectFit: "cover" }}
               />
             </Grid>
           ))}
