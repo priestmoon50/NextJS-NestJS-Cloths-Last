@@ -27,9 +27,11 @@
     color: #fff;
     min-width: 300px;
     padding: 10px;
-    margin-top: 10px; /* ایجاد فاصله شیک از ناوبار */
+    margin-top: 0; /* ایجاد فاصله کمتر برای جلوگیری از تکان خوردن */
     box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.5); /* سایه برای زیبایی بیشتر */
+    position: relative; /* یا می‌توانید به جای relative از fixed استفاده کنید */
   }
+  
   
   .menuItemHover:hover {
     background-color: #3c3c3c; /* تغییر رنگ در هنگام هاور برای آیتم‌های منو */

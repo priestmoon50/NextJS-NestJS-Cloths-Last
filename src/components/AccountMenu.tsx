@@ -15,15 +15,18 @@ import { useTranslation } from "react-i18next"; // اضافه کردن i18n بر
 import styles from "./AccountMenu.module.css";
 
 const AccountMenu: React.FC = () => {
-  const { t } = useTranslation();  // استفاده از hook ترجمه
+  const { t } = useTranslation(); // استفاده از hook ترجمه
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { logout, isAuthenticated } = useAuth();
   const router = useRouter();
 
   // مدیریت باز و بسته شدن منو
-  const handleMouseEnter = useCallback((event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  }, []);
+  const handleMouseEnter = useCallback(
+    (event: React.MouseEvent<HTMLElement>) => {
+      setAnchorEl(event.currentTarget);
+    },
+    []
+  );
 
   const handleMouseLeave = useCallback(() => {
     setAnchorEl(null);
@@ -54,10 +57,9 @@ const AccountMenu: React.FC = () => {
         }}
       >
         <AccountCircleIcon sx={{ marginRight: "5px" }} />
-        {t('account')} {/* استفاده از ترجمه برای "Account" */}
+        {t("account")} {/* استفاده از ترجمه برای "Account" */}
         <ArrowDropDownIcon />
       </Button>
-
       <Menu
         id="account-menu"
         anchorEl={anchorEl}
@@ -71,24 +73,30 @@ const AccountMenu: React.FC = () => {
           vertical: "top",
           horizontal: "center",
         }}
-        MenuListProps={{
-          "aria-labelledby": "account-button",
-        }}
+        disableScrollLock={true} // غیرفعال کردن قفل اسکرول
         PaperProps={{
-          className: styles.menuPaper,
+          sx: {
+            position: "absolute",
+          },
         }}
       >
         {!isAuthenticated ? (
           <div>
             <Link href="/auth/phone-verification" passHref>
-              <MenuItem onClick={handleMouseLeave} className={styles.logInButton}>
-                {t('login')} {/* استفاده از ترجمه برای "Log In" */}
+              <MenuItem
+                onClick={handleMouseLeave}
+                className={styles.logInButton}
+              >
+                {t("login")} {/* استفاده از ترجمه برای "Log In" */}
               </MenuItem>
             </Link>
             <Link href="/auth/phone-verification" passHref>
-              <MenuItem onClick={handleMouseLeave} className={styles.menuItemHover}>
+              <MenuItem
+                onClick={handleMouseLeave}
+                className={styles.menuItemHover}
+              >
                 <PersonAddIcon sx={{ marginRight: "10px" }} />
-                {t('signUp')} {/* استفاده از ترجمه برای "Sign Up" */}
+                {t("signUp")} {/* استفاده از ترجمه برای "Sign Up" */}
               </MenuItem>
             </Link>
           </div>
@@ -96,23 +104,24 @@ const AccountMenu: React.FC = () => {
           <div>
             <MenuItem onClick={handleLogout} className={styles.menuItemHover}>
               <AccountCircleIcon sx={{ marginRight: "10px" }} />
-              {t('logout')} {/* استفاده از ترجمه برای "Logout" */}
+              {t("logout")} {/* استفاده از ترجمه برای "Logout" */}
             </MenuItem>
           </div>
         )}
         <Divider className={styles.divider} />
         <MenuItem onClick={handleMouseLeave} className={styles.menuItemHover}>
           <SettingsIcon sx={{ marginRight: "10px" }} />
-          {t('accountSettings')} {/* استفاده از ترجمه برای "Account Settings" */}
+          {t("accountSettings")}{" "}
+          {/* استفاده از ترجمه برای "Account Settings" */}
         </MenuItem>
         <Divider className={styles.divider} />
         <MenuItem onClick={handleMouseLeave} className={styles.menuItemHover}>
           <SupportIcon sx={{ marginRight: "10px" }} />
-          {t('support')} {/* استفاده از ترجمه برای "Support" */}
+          {t("support")} {/* استفاده از ترجمه برای "Support" */}
         </MenuItem>
         <MenuItem onClick={handleMouseLeave} className={styles.menuItemHover}>
           <ShopIcon sx={{ marginRight: "10px" }} />
-          {t('shop')} {/* استفاده از ترجمه برای "Shop" */}
+          {t("shop")} {/* استفاده از ترجمه برای "Shop" */}
         </MenuItem>
       </Menu>
     </Box>

@@ -151,6 +151,7 @@ const NavBar: React.FC = () => {
               display: "flex",
               justifyContent: "flex-end",
               alignItems: "center",
+              
             }}
           >
             <AccountMenu />

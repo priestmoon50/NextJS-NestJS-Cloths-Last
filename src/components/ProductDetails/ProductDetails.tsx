@@ -1,10 +1,21 @@
 // components/ProductDetails/ProductDetails.tsx
 import { FC, useState } from "react";
-import { Container, Grid, Typography, Box, MenuItem, Select, TextField, Button, Modal, IconButton } from "@mui/material";
+import {
+  Container,
+  Grid,
+  Typography,
+  Box,
+  MenuItem,
+  Select,
+  TextField,
+  Button,
+  Modal,
+  IconButton,
+} from "@mui/material";
 import ProductImages from "./ProductImages";
 import ProductPrice from "./ProductPrice";
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { Product } from "@/data/types";
 import Link from "next/link";
 import styles from "./ProductDetails.module.css"; // ایمپورت فایل CSS module
@@ -43,19 +54,27 @@ const ProductDetails: FC<{ product: Product }> = ({ product }) => {
         </Grid>
 
         <Grid item xs={12} md={6} className={styles.productInfo}>
-          <Typography variant="h4" component="h1" className={styles.productTitle}>
+          <Typography
+            variant="h4"
+            component="h1"
+            className={styles.productTitle}
+          >
             {product.name}
           </Typography>
 
           <ProductPrice price={product.price} discount={product.discount} />
 
           {/* آیکون قلب برای افزودن به لیست پسندیده‌ها */}
-          <Box sx={{ mt: 2, display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ mt: 2, display: "flex", alignItems: "center" }}>
             <IconButton onClick={toggleLike}>
-              {liked ? <FavoriteIcon color="error" /> : <FavoriteBorderIcon color="error" />}
+              {liked ? (
+                <FavoriteIcon color="error" />
+              ) : (
+                <FavoriteBorderIcon color="error" />
+              )}
             </IconButton>
             <Typography variant="body2" sx={{ ml: 1 }}>
-              {liked ? 'Added to Favorites' : 'Add to Favorites'}
+              {liked ? "Added to Favorites" : "Add to Favorites"}
             </Typography>
           </Box>
 
@@ -69,11 +88,16 @@ const ProductDetails: FC<{ product: Product }> = ({ product }) => {
 
           {/* انتخاب سایز */}
           <Box className={styles.selectWrapper}>
-            <Typography variant="body2" className={styles.selectLabel}>Select Size:</Typography>
+            <Typography variant="body2" className={styles.selectLabel}>
+              Select Size:
+            </Typography>
             <Select
               value={selectedSize || ""}
               onChange={(e) => setSelectedSize(e.target.value as string)}
               fullWidth
+              MenuProps={{
+                disableScrollLock: true, // جلوگیری از قفل شدن اسکرول
+              }}
             >
               {Array.isArray(product.sizes) &&
                 product.sizes.map((size) => (
@@ -86,11 +110,16 @@ const ProductDetails: FC<{ product: Product }> = ({ product }) => {
 
           {/* انتخاب رنگ */}
           <Box className={styles.selectWrapper}>
-            <Typography variant="body2" className={styles.selectLabel}>Select Color:</Typography>
+            <Typography variant="body2" className={styles.selectLabel}>
+              Select Color:
+            </Typography>
             <Select
               value={selectedColor || ""}
               onChange={(e) => setSelectedColor(e.target.value as string)}
               fullWidth
+              MenuProps={{
+                disableScrollLock: true, // جلوگیری از قفل شدن اسکرول
+              }}
             >
               {Array.isArray(product.colors) &&
                 product.colors.map((color) => (
@@ -103,7 +132,9 @@ const ProductDetails: FC<{ product: Product }> = ({ product }) => {
 
           {/* انتخاب تعداد */}
           <Box className={styles.quantityInput}>
-            <Typography variant="body2" className={styles.selectLabel}>Quantity:</Typography>
+            <Typography variant="body2" className={styles.selectLabel}>
+              Quantity:
+            </Typography>
             <TextField
               type="number"
               value={quantity}
@@ -118,15 +149,30 @@ const ProductDetails: FC<{ product: Product }> = ({ product }) => {
             <Button variant="contained" onClick={handleOpenSizeGuide}>
               Size Info
             </Button>
-            <Modal open={openSizeGuide} onClose={handleCloseSizeGuide}>
-              <Box sx={{ p: 4, backgroundColor: 'white', borderRadius: 2, maxWidth: 400, margin: 'auto', mt: '10%' }}>
+            <Modal
+              open={openSizeGuide}
+              onClose={handleCloseSizeGuide}
+              disableScrollLock={true}
+            >
+              <Box
+                sx={{
+                  p: 4,
+                  backgroundColor: "white",
+                  borderRadius: 2,
+                  maxWidth: 400,
+                  margin: "auto",
+                  mt: "10%",
+                }}
+              >
                 {/* استفاده از داده‌های پویا برای نمایش راهنمای اندازه */}
                 {product.sizeGuide && product.sizeGuide.length > 0 ? (
                   <SizeGuide sizeGuide={product.sizeGuide} />
                 ) : (
-                  <Typography> Sizes are not avialble !</Typography>
+                  <Typography>Sizes are not available!</Typography>
                 )}
-                <Button onClick={handleCloseSizeGuide} sx={{ mt: 2 }}>بستن</Button>
+                <Button onClick={handleCloseSizeGuide} sx={{ mt: 2 }}>
+                  بستن
+                </Button>
               </Box>
             </Modal>
           </Box>
