@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState, useEffect } from "react";
 import {
@@ -31,7 +31,8 @@ const CheckoutPage: React.FC = () => {
   const [userData, setUserData] = useState({ name: "", phone: "", userId: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
-  const [openModal, setOpenModal] = useState(false);
+  const [openModal, setOpenModal] = useState(false); // حالت مودال
+  const [canPlaceOrder, setCanPlaceOrder] = useState(false); // بررسی اینکه آیا سفارش قابل ارسال است یا خیر
 
   const {
     handleSubmit,
@@ -67,18 +68,24 @@ const CheckoutPage: React.FC = () => {
           setHasError(true);
           setIsLoading(false);
         });
-    } else {
-      setOpenModal(true);
     }
   }, []);
 
+  // بررسی وضعیت ورود و بستن مودال
   useEffect(() => {
     if (isAuthenticated) {
       setOpenModal(false);
     }
   }, [isAuthenticated]);
 
+  // مدیریت دکمه Place Order
   const handlePlaceOrder = async (data: any) => {
+    if (!isAuthenticated) {
+      setOpenModal(true); // اگر کاربر وارد نشده باشد، مودال باز می‌شود
+      return;
+    }
+
+    // در صورت وارد شدن کاربر، ادامه پروسه سفارش
     try {
       const orderData = {
         userId: userData.userId,
@@ -117,7 +124,10 @@ const CheckoutPage: React.FC = () => {
       </Typography>
 
       {/* مودال ورود */}
-      <SignInModal open={openModal} />
+      <SignInModal
+        open={openModal}
+        onClose={() => setOpenModal(false)} // امکان بستن مودال
+      />
 
       <form onSubmit={handleSubmit(handlePlaceOrder)}>
         <Box sx={{ marginBottom: "20px" }}>
