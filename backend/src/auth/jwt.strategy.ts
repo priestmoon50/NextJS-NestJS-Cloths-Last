@@ -1,12 +1,14 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { AuthService } from './auth.service';
+import { UsersService } from '../users/users.service'; // اضافه کردن UsersService
 import { JwtPayload } from './jwt-payload.interface';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly authService: AuthService) {
+  constructor(
+    private readonly usersService: UsersService,  // استفاده از UsersService
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: process.env.JWT_SECRET || 'secretKey', // استفاده از کلید JWT از .env
@@ -17,7 +19,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: JwtPayload) {
     try {
       console.log('Validating JWT Payload:', payload);  // لاگ کردن payload برای دیباگ
-      const user = await this.authService.findByPhone(payload.phone); // استفاده از findByPhone
+      // استفاده از UsersService برای یافتن کاربر با شماره تلفن
+      const user = await this.usersService.findByPhone(payload.phone); 
       if (!user) {
         console.error(`User with phone ${payload.phone} not found or token invalid`);
         throw new UnauthorizedException('Invalid token or user not found');

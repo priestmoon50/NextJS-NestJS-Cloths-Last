@@ -1,19 +1,26 @@
 import axios from 'axios';
 
-const API_KEY = process.env.PARS_GREEN_API_KEY; // دسترسی به API key از طریق process.env
-const SMS_API_URL = 'https://api.parsgreen.ir/v1/'; // آدرس API سرویس پیامک
+// تابع تولید کد ۴ رقمی
+const generateVerificationCode = (): string => {
+  return Math.floor(1000 + Math.random() * 9000).toString();
+};
 
-export const sendSms = async (phone: string, message: string) => {
+export const sendSms = async (phone: string) => {
+  const code = generateVerificationCode(); // تولید کد ۴ رقمی
   try {
-    const response = await axios.post(`${SMS_API_URL}/send`, {
-      api_key: API_KEY, // استفاده از کلید API که از .env.local میاد
-      phone_number: phone, // شماره تلفن مقصد
-      message: message, // متن پیامک
+    // به جای ارسال پیامک، کد را به سرور ارسال می‌کنیم تا در دیتابیس ذخیره شود
+    const response = await axios.post('http://localhost:3001/auth/save-code', {
+      phone_number: phone, // شماره تلفن کاربر
+      code: code, // کد تایید
     });
-    
+
     return response.data;
   } catch (error) {
-    console.error('Failed to send SMS:', error);
+    if (axios.isAxiosError(error)) {
+      console.error('Axios error:', error.response?.data);
+    } else {
+      console.error('Error:', error);
+    }
     throw error;
   }
 };

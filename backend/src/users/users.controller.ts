@@ -1,6 +1,5 @@
 import { Controller, Get, Patch, Param, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -22,8 +21,11 @@ export class UsersController {
   // مثال متد برای بروزرسانی اطلاعات کاربر
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
-  async updateUser(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    const updatedUser = await this.usersService.update(id, updateUserDto);
+  async updateUser(
+    @Param('id') id: string, 
+    @Body() updateUserData: { phone?: string }, // به جای UpdateUserDto از یک نوع مستقیم استفاده می‌کنیم
+  ) {
+    const updatedUser = await this.usersService.update(id, updateUserData);
     return {
       message: 'User updated successfully',
       user: updatedUser,

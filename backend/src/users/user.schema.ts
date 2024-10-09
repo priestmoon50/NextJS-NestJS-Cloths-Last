@@ -5,14 +5,17 @@ export type UserDocument = User & Document;
 
 @Schema()
 export class User {
-  @Prop({ required: true })
-  username: string;
-
   @Prop({ required: true, unique: true })
-  phone: string;  // شماره تماس با پشتیبانی از فرمت‌های مختلف
+  phone: string;  // شماره تلفن به عنوان شناسه یکتا
 
-  @Prop({ required: true })
-  password: string;
+  @Prop()  // اضافه کردن فیلد برای ذخیره کد تایید
+  otp: string;
+
+  @Prop()  // اضافه کردن فیلد برای ذخیره زمان انقضای OTP
+  otpExpiryTime: number;
+
+  @Prop({ default: false })  // اضافه کردن فیلد وضعیت تایید کاربر
+  isVerified: boolean;
 
   _id?: Types.ObjectId; // اختیاری کردن _id
 }
