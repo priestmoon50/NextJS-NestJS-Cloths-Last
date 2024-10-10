@@ -7,7 +7,7 @@ export class UsersController {
     private readonly usersService: UsersService,
   ) {}
 
-  // مثال متد برای دریافت اطلاعات پروفایل کاربر
+  // دریافت اطلاعات کاربر با استفاده از ID
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   async getUser(@Param('id') id: string) {
@@ -18,16 +18,41 @@ export class UsersController {
     };
   }
 
-  // مثال متد برای بروزرسانی اطلاعات کاربر
+  // دریافت اطلاعات کاربر با استفاده از شماره تلفن
+  @Get('phone/:phone')
+  @HttpCode(HttpStatus.OK)
+  async getUserByPhone(@Param('phone') phone: string) {
+    const user = await this.usersService.findByPhone(phone);
+    return {
+      message: 'User retrieved successfully by phone',
+      user,
+    };
+  }
+
+  // بروزرسانی اطلاعات کاربر (مثلا شماره تلفن)
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
   async updateUser(
     @Param('id') id: string, 
-    @Body() updateUserData: { phone?: string }, // به جای UpdateUserDto از یک نوع مستقیم استفاده می‌کنیم
+    @Body() updateUserData: { phone?: string }, // استفاده از داده‌های مستقیم برای بروزرسانی
   ) {
     const updatedUser = await this.usersService.update(id, updateUserData);
     return {
       message: 'User updated successfully',
+      user: updatedUser,
+    };
+  }
+
+  // بروزرسانی وضعیت تایید کاربر (isVerified)
+  @Patch('verify/:phone')
+  @HttpCode(HttpStatus.OK)
+  async updateVerificationStatus(
+    @Param('phone') phone: string,
+    @Body() verificationData: { isVerified: boolean }, // دریافت وضعیت تایید از درخواست
+  ) {
+    const updatedUser = await this.usersService.updateUserVerificationStatus(phone, verificationData.isVerified);
+    return {
+      message: 'User verification status updated successfully',
       user: updatedUser,
     };
   }

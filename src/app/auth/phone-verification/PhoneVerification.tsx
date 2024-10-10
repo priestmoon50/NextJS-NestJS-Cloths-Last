@@ -17,14 +17,17 @@ export default function PhoneVerification() {
     setLoading(true);
     try {
       const response = await axios.post(`${baseURL}/auth/verify-phone`, { phone });
+      console.log('Server response:', response.data); // اضافه کردن لاگ برای بررسی پاسخ سرور
       setIsCodeSent(true);
       setError('');
     } catch (err) {
+      console.error('Error sending verification code:', err); // لاگ کردن خطا
       setError('Failed to send verification code');
     } finally {
       setLoading(false);
     }
   };
+  
 
   const verifyCode = async () => {
     setLoading(true);

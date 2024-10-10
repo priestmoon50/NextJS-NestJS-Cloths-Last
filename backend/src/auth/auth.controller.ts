@@ -1,48 +1,95 @@
-import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, UsePipes, ValidationPipe, HttpCode, HttpStatus, Logger } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SmsService } from './sms.service';
-import { UsersService } from '../users/users.service'; // اضافه کردن UsersService
+import { UsersService } from '../users/users.service';
 
 @Controller('auth')
 export class AuthController {
+  private readonly logger = new Logger(AuthController.name); // اضافه کردن Logger
+
   constructor(
     private readonly authService: AuthService,
     private readonly smsService: SmsService,
-    private readonly usersService: UsersService,  // استفاده از UsersService
+    private readonly usersService: UsersService, // استفاده از UsersService
   ) {}
 
-  // ارسال کد تایید به شماره تلفن (بدون بررسی وجود کاربر)
+  // تابع برای مدیریت کاربرانی که از قبل وجود دارند
+  async handleExistingUser(phone: string) {
+    this.logger.log(`Handling existing user: ${phone}`);
+    // تولید کد تایید (OTP)
+    const otp = await this.authService.generateVerificationCode(phone);
+
+    // به‌روزرسانی OTP و زمان انقضا برای کاربر موجود
+    const otpExpiryTime = Date.now() + 10 * 60 * 1000; // انقضای 10 دقیقه
+    await this.usersService.updateUserOtp(phone, otp, otpExpiryTime);
+
+    // ارسال کد تایید به کاربر
+    await this.smsService.sendVerificationCode(phone, otp);
+    this.logger.log(`Verification code sent to existing user: ${phone}`);
+    return { message: 'Verification code sent to existing user' };
+  }
+
+  // تابع برای مدیریت کاربرانی که از قبل وجود ندارند (کاربر جدید)
+  async handleNewUser(phone: string) {
+    this.logger.log(`Handling new user: ${phone}`);
+
+    // تولید کد تایید (OTP)
+    const otp = await this.authService.generateVerificationCode(phone);
+
+    // ایجاد کاربر موقت با OTP و زمان انقضا
+    const otpExpiryTime = Date.now() + 10 * 60 * 1000; // انقضای 10 دقیقه
+    try {
+      await this.usersService.createTemporaryUser(phone, otp, otpExpiryTime);
+      this.logger.log(`Temporary user created successfully for phone: ${phone}`);
+    } catch (error) {
+      this.logger.error(`Error creating temporary user for phone ${phone}: ${error.message}`);
+      throw error;
+    }
+
+    // ارسال کد تایید به کاربر
+    await this.smsService.sendVerificationCode(phone, otp);
+    this.logger.log(`Verification code sent to new user: ${phone}`);
+    return { message: 'Verification code sent to new user' };
+  }
+
+  // ارسال کد تایید به شماره تلفن
   @Post('verify-phone')
   @HttpCode(HttpStatus.OK)
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
   async verifyPhone(@Body() { phone }: { phone: string }) {
-    // تولید کد تایید (OTP)
-    const otp = await this.authService.generateVerificationCode(phone);
-  
-    // ذخیره کاربر موقت به همراه OTP و زمان انقضا
-    const otpExpiryTime = Date.now() + 10 * 60 * 1000; // انقضای 10 دقیقه
-    await this.usersService.createTemporaryUser(phone, otp, otpExpiryTime);
-  
-    // ارسال کد تایید به کاربر
-    await this.smsService.sendVerificationCode(phone, otp);
-    return { message: 'Verification code sent' };
+    this.logger.log(`Verifying phone number: ${phone}`);
+
+    const user = await this.usersService.findByPhone(phone);
+
+    // اگر کاربر وجود داشت
+    if (user) {
+      this.logger.log(`User found: ${phone}`);
+      return this.handleExistingUser(phone);
+    }
+
+    // اگر کاربر وجود نداشت
+    this.logger.log(`User not found, creating new user: ${phone}`);
+    return this.handleNewUser(phone);
   }
 
   // تایید کد ارسال شده و ورود کاربر
   @Post('confirm-code')
   @HttpCode(HttpStatus.OK)
   async confirmCode(@Body() { phone, code }: { phone: string; code: string }) {
-    // ابتدا بررسی کد تایید
+    this.logger.log(`Confirming code for phone: ${phone}`);
+    // بررسی کد تایید
     const isValid = await this.authService.verifyCode(phone, code);
     if (!isValid) {
+      this.logger.warn(`Invalid verification code for phone: ${phone}`);
       return { message: 'Invalid verification code', success: false };
     }
 
     // پیدا کردن کاربر
-    const user = await this.usersService.findByPhone(phone);
+    let user = await this.usersService.findByPhone(phone);
 
-    // اگر کاربر یافت نشد
+    // اگر کاربر وجود نداشت
     if (!user) {
+      this.logger.warn(`User not found for phone: ${phone}`);
       return { message: 'User not found', success: false };
     }
 
@@ -52,6 +99,7 @@ export class AuthController {
 
     // تولید توکن JWT
     const token = await this.authService.generateJwtToken(user);
+    this.logger.log(`Login successful for phone: ${phone}`);
     return {
       message: 'Login successful',
       accessToken: token,
@@ -64,29 +112,30 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
   async sendLoginCode(@Body() { phone }: { phone: string }) {
-    // تولید کد تایید (OTP)
-    const otp = await this.authService.generateVerificationCode(phone);
+    this.logger.log(`Sending login code to phone: ${phone}`);
 
     // بررسی وجود کاربر
     const user = await this.usersService.findByPhone(phone);
-    if (!user) {
-      // اگر کاربر یافت نشد، کاربر موقت ایجاد شود
-      const otpExpiryTime = Date.now() + 10 * 60 * 1000; // انقضای 10 دقیقه
-      await this.usersService.createTemporaryUser(phone, otp, otpExpiryTime);
+
+    // اگر کاربر وجود داشت
+    if (user) {
+      return this.handleExistingUser(phone);
     }
 
-    // ارسال کد تایید به کاربر
-    await this.smsService.sendVerificationCode(phone, otp);
-    return { message: 'Login code sent to phone number' };
+    // اگر کاربر وجود نداشت
+    return this.handleNewUser(phone);
   }
 
   // تایید کد لاگین و ورود کاربر
   @Post('login-confirm')
   @HttpCode(HttpStatus.OK)
   async loginConfirm(@Body() { phone, code }: { phone: string; code: string }) {
+    this.logger.log(`Login confirmation for phone: ${phone}`);
+    
     // تایید کد
     const isValid = await this.authService.verifyCode(phone, code);
     if (!isValid) {
+      this.logger.warn(`Invalid login code for phone: ${phone}`);
       return { message: 'Invalid verification code', success: false };
     }
 
@@ -95,6 +144,7 @@ export class AuthController {
 
     // اگر کاربر یافت نشد، ثبت‌نام جدید انجام شود
     if (!user) {
+      this.logger.log(`Registering new user for phone: ${phone}`);
       user = await this.authService.register({ phone });
     }
 
@@ -103,6 +153,7 @@ export class AuthController {
 
     // تولید توکن JWT
     const token = await this.authService.generateJwtToken(user);
+    this.logger.log(`Login successful for phone: ${phone}`);
     return {
       message: 'Login successful',
       accessToken: token,
