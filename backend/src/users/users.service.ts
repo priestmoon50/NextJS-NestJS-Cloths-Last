@@ -10,26 +10,56 @@ export class UsersService {
 
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-  // ایجاد کاربر جدید فقط با شماره تلفن
-  async create(userData: { phone: string }): Promise<User> {
-    try {
-      const existingUser = await this.userModel.findOne({ phone: userData.phone }).exec();
-      if (existingUser) {
-        throw new ConflictException('Phone number already registered.');
-      }
-
-      // ایجاد کاربر جدید با شماره تلفن
-      const createdUser = new this.userModel({ phone: userData.phone });
-      return await createdUser.save();
-    } catch (error) {
-      this.logger.error(`Failed to create user: ${error.message}`);
-      throw new NotFoundException('Failed to create user. Please try again.');
+// ایجاد کاربر جدید با فیلدهای اضافی
+async create(userData: { phone: string, email?: string, address?: string, fullname?: string }): Promise<User> {
+  try {
+    const existingUser = await this.userModel.findOne({ phone: userData.phone }).exec();
+    if (existingUser) {
+      throw new ConflictException('Phone number already registered.');
     }
+
+    // ایجاد کاربر جدید با داده‌های اضافی
+    const createdUser = new this.userModel({
+      phone: userData.phone,
+      email: userData.email,
+      address: userData.address,
+      fullname: userData.fullname,
+    });
+    return await createdUser.save();
+  } catch (error) {
+    this.logger.error(`Failed to create user: ${error.message}`);
+    throw new NotFoundException('Failed to create user. Please try again.');
   }
+}
+
+// به‌روزرسانی اطلاعات کاربر شامل ایمیل، آدرس و نام کامل
+async updateUserInfo(phone: string, email?: string, address?: string, fullname?: string): Promise<User> {
+  const user = await this.userModel.findOne({ phone }).exec();
+  if (!user) {
+    throw new NotFoundException('User not found');
+  }
+
+  // به‌روزرسانی فیلدهای کاربر
+  user.email = email || user.email;
+  user.address = address || user.address;
+  user.fullname = fullname || user.fullname;
+
+  try {
+    return await user.save();
+  } catch (error) {
+    this.logger.error(`Failed to update user info for phone: ${phone}`);
+    throw new NotFoundException('Failed to update user info.');
+  }
+}
+
+
+
+
 
 
 // ایجاد کاربر موقت همراه با OTP و زمان انقضا
-async createTemporaryUser(phone: string, otp: string, otpExpiryTime: number): Promise<User> {
+// ایجاد کاربر موقت با فیلدهای اضافی
+async createTemporaryUser(phone: string, otp: string, otpExpiryTime: number, email?: string, address?: string, fullname?: string): Promise<User> {
   this.logger.log(`Attempting to create a temporary user for phone: ${phone}`);
 
   // بررسی وجود کاربر با این شماره تلفن
@@ -42,12 +72,15 @@ async createTemporaryUser(phone: string, otp: string, otpExpiryTime: number): Pr
   // هش کردن OTP برای امنیت بیشتر
   const hashedOtp = await bcrypt.hash(otp, 10);
 
-  // ایجاد کاربر موقت با OTP هش‌شده و زمان انقضا
+  // ایجاد کاربر موقت با فیلدهای اضافی
   const createdUser = new this.userModel({
     phone,
-    otp: hashedOtp, // ذخیره کد تایید هش شده
+    otp: hashedOtp,
     otpExpiryTime,
-    isVerified: false, // کاربر تایید نشده است
+    isVerified: false,
+    email: email || null,
+    address: address || null,
+    fullname: fullname || null,
   });
 
   try {
@@ -59,6 +92,7 @@ async createTemporaryUser(phone: string, otp: string, otpExpiryTime: number): Pr
     throw new NotFoundException('Failed to create temporary user.');
   }
 }
+
 
 
 

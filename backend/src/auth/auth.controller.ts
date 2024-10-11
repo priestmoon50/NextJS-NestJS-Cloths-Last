@@ -29,83 +29,94 @@ export class AuthController {
     return { message: 'Verification code sent to existing user' };
   }
 
-  // تابع برای مدیریت کاربرانی که از قبل وجود ندارند (کاربر جدید)
-  async handleNewUser(phone: string) {
-    this.logger.log(`Handling new user: ${phone}`);
 
-    // تولید کد تایید (OTP)
-    const otp = await this.authService.generateVerificationCode(phone);
+// تابع برای مدیریت کاربرانی که از قبل وجود ندارند (کاربر جدید)
+async handleNewUser(phone: string, email?: string, address?: string, fullname?: string) {
+  this.logger.log(`Handling new user: ${phone}`);
 
-    // ایجاد کاربر موقت با OTP و زمان انقضا
-    const otpExpiryTime = Date.now() + 10 * 60 * 1000; // انقضای 10 دقیقه
-    try {
-      await this.usersService.createTemporaryUser(phone, otp, otpExpiryTime);
-      this.logger.log(`Temporary user created successfully for phone: ${phone}`);
-    } catch (error) {
-      this.logger.error(`Error creating temporary user for phone ${phone}: ${error.message}`);
-      throw error;
-    }
+  // تولید کد تایید (OTP)
+  const otp = await this.authService.generateVerificationCode(phone);
 
-    // ارسال کد تایید به کاربر
-    await this.smsService.sendVerificationCode(phone, otp);
-    this.logger.log(`Verification code sent to new user: ${phone}`);
-    return { message: 'Verification code sent to new user' };
+  // ایجاد کاربر موقت با OTP و زمان انقضا و فیلدهای اضافی
+  const otpExpiryTime = Date.now() + 10 * 60 * 1000; // انقضای 10 دقیقه
+  try {
+    await this.usersService.createTemporaryUser(phone, otp, otpExpiryTime, email, address, fullname);
+    this.logger.log(`Temporary user created successfully for phone: ${phone}`);
+  } catch (error) {
+    this.logger.error(`Error creating temporary user for phone ${phone}: ${error.message}`);
+    throw error;
   }
+
+  // ارسال کد تایید به کاربر
+  await this.smsService.sendVerificationCode(phone, otp);
+  this.logger.log(`Verification code sent to new user: ${phone}`);
+  return { message: 'Verification code sent to new user' };
+}
+
 
   // ارسال کد تایید به شماره تلفن
   @Post('verify-phone')
   @HttpCode(HttpStatus.OK)
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
-  async verifyPhone(@Body() { phone }: { phone: string }) {
+  async verifyPhone(
+    @Body() { phone, email, address, fullname }: { phone: string; email?: string; address?: string; fullname?: string }) {
+    
     this.logger.log(`Verifying phone number: ${phone}`);
-
+  
     const user = await this.usersService.findByPhone(phone);
-
+  
     // اگر کاربر وجود داشت
     if (user) {
       this.logger.log(`User found: ${phone}`);
       return this.handleExistingUser(phone);
     }
-
+  
     // اگر کاربر وجود نداشت
     this.logger.log(`User not found, creating new user: ${phone}`);
-    return this.handleNewUser(phone);
+    return this.handleNewUser(phone, email, address, fullname);
+  }
+  
+
+// تایید کد ارسال شده و ورود کاربر
+@Post('confirm-code')
+@HttpCode(HttpStatus.OK)
+async confirmCode(@Body() { phone, code }: { phone: string; code: string }) {
+  this.logger.log(`Confirming code for phone: ${phone}`);
+  
+  // بررسی کد تایید
+  const isValid = await this.authService.verifyCode(phone, code);
+  if (!isValid) {
+    this.logger.warn(`Invalid verification code for phone: ${phone}`);
+    return { message: 'Invalid verification code', success: false };
   }
 
-  // تایید کد ارسال شده و ورود کاربر
-  @Post('confirm-code')
-  @HttpCode(HttpStatus.OK)
-  async confirmCode(@Body() { phone, code }: { phone: string; code: string }) {
-    this.logger.log(`Confirming code for phone: ${phone}`);
-    // بررسی کد تایید
-    const isValid = await this.authService.verifyCode(phone, code);
-    if (!isValid) {
-      this.logger.warn(`Invalid verification code for phone: ${phone}`);
-      return { message: 'Invalid verification code', success: false };
-    }
+  // پیدا کردن کاربر
+  let user = await this.usersService.findByPhone(phone);
 
-    // پیدا کردن کاربر
-    let user = await this.usersService.findByPhone(phone);
-
-    // اگر کاربر وجود نداشت
-    if (!user) {
-      this.logger.warn(`User not found for phone: ${phone}`);
-      return { message: 'User not found', success: false };
-    }
-
-    // به‌روزرسانی وضعیت تایید کاربر
-    user.isVerified = true;
-    await this.usersService.updateUserVerificationStatus(phone, true);
-
-    // تولید توکن JWT
-    const token = await this.authService.generateJwtToken(user);
-    this.logger.log(`Login successful for phone: ${phone}`);
-    return {
-      message: 'Login successful',
-      accessToken: token,
-      user,
-    };
+  if (!user) {
+    this.logger.warn(`User not found for phone: ${phone}`);
+    return { message: 'User not found', success: false };
   }
+
+  // به‌روزرسانی وضعیت تایید کاربر
+  user.isVerified = true;
+  await this.usersService.updateUserVerificationStatus(phone, true);
+
+  // تولید توکن JWT
+  const token = await this.authService.generateJwtToken(user);
+
+  // بازگرداندن تمام اطلاعات کاربر
+  return {
+    message: 'Login successful',
+    accessToken: token,
+    user: {
+      phone: user.phone,
+      email: user.email,
+      address: user.address,
+      fullname: user.fullname,
+    },
+  };
+}
 
   // ارسال کد لاگین به شماره تلفن
   @Post('login')
@@ -126,38 +137,46 @@ export class AuthController {
     return this.handleNewUser(phone);
   }
 
-  // تایید کد لاگین و ورود کاربر
-  @Post('login-confirm')
-  @HttpCode(HttpStatus.OK)
-  async loginConfirm(@Body() { phone, code }: { phone: string; code: string }) {
-    this.logger.log(`Login confirmation for phone: ${phone}`);
-    
-    // تایید کد
-    const isValid = await this.authService.verifyCode(phone, code);
-    if (!isValid) {
-      this.logger.warn(`Invalid login code for phone: ${phone}`);
-      return { message: 'Invalid verification code', success: false };
-    }
 
-    // پیدا کردن کاربر
-    let user = await this.usersService.findByPhone(phone);
-
-    // اگر کاربر یافت نشد، ثبت‌نام جدید انجام شود
-    if (!user) {
-      this.logger.log(`Registering new user for phone: ${phone}`);
-      user = await this.authService.register({ phone });
-    }
-
-    // به‌روزرسانی وضعیت تایید کاربر
-    user = await this.usersService.updateUserVerificationStatus(phone, true);
-
-    // تولید توکن JWT
-    const token = await this.authService.generateJwtToken(user);
-    this.logger.log(`Login successful for phone: ${phone}`);
-    return {
-      message: 'Login successful',
-      accessToken: token,
-      user,
-    };
+// تایید کد لاگین و ورود کاربر
+@Post('login-confirm')
+@HttpCode(HttpStatus.OK)
+async loginConfirm(@Body() { phone, code }: { phone: string; code: string }) {
+  this.logger.log(`Login confirmation for phone: ${phone}`);
+  
+  // تایید کد
+  const isValid = await this.authService.verifyCode(phone, code);
+  if (!isValid) {
+    this.logger.warn(`Invalid login code for phone: ${phone}`);
+    return { message: 'Invalid verification code', success: false };
   }
+
+  // پیدا کردن کاربر
+  let user = await this.usersService.findByPhone(phone);
+
+  if (!user) {
+    this.logger.log(`Registering new user for phone: ${phone}`);
+    user = await this.authService.register({ phone });
+  }
+
+  // به‌روزرسانی وضعیت تایید کاربر
+  user = await this.usersService.updateUserVerificationStatus(phone, true);
+
+  // تولید توکن JWT
+  const token = await this.authService.generateJwtToken(user);
+
+  // ارسال تمام اطلاعات کاربر
+  return {
+    message: 'Login successful',
+    accessToken: token,
+    user: {
+      phone: user.phone,
+      email: user.email,
+      address: user.address,
+      fullname: user.fullname,
+    },
+  };
+}
+
+
 }

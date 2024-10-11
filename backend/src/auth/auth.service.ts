@@ -75,35 +75,50 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-
+  
     // به‌روزرسانی وضعیت تایید کاربر
     await this.usersService.updateUserVerificationStatus(phone, true);
-
+  
     // تولید توکن JWT
     const token = this.generateJwtToken(user);
+  
+    // برگرداندن اطلاعات کامل کاربر
     return {
       message: 'Login successful',
       accessToken: token,
-      user,
+      user: {
+        phone: user.phone,
+        email: user.email,
+        address: user.address,
+        fullname: user.fullname,
+      },
     };
   }
-
+  
   // مدیریت کاربران جدید (ثبت‌نام)
   async handleNewUser(phone: string): Promise<any> {
     // ثبت‌نام کاربر جدید
     let newUser = await this.register({ phone });
-
+  
     // به‌روزرسانی وضعیت تایید کاربر
     newUser = await this.usersService.updateUserVerificationStatus(phone, true);
-
+  
     // تولید توکن JWT
     const token = this.generateJwtToken(newUser);
+  
+    // برگرداندن اطلاعات کامل کاربر
     return {
       message: 'Registration and login successful',
       accessToken: token,
-      user: newUser,
+      user: {
+        phone: newUser.phone,
+        email: newUser.email,
+        address: newUser.address,
+        fullname: newUser.fullname,
+      },
     };
   }
+  
 
   // تایید کد و مدیریت کاربران موجود یا جدید
   async confirmCode(phone: string, code: string): Promise<any> {
@@ -111,7 +126,7 @@ export class AuthService {
     if (!isValid) {
       throw new UnauthorizedException('Invalid verification code');
     }
-
+  
     // بررسی وجود کاربر
     const user = await this.usersService.findByPhone(phone);
     if (user) {
@@ -122,6 +137,7 @@ export class AuthService {
       return this.handleNewUser(phone);
     }
   }
+  
 
   // ثبت‌نام کاربر با استفاده از شماره تلفن
   async register({ phone }: { phone: string }) {

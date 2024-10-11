@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useCallback } from "react";
 import { Button, Menu, MenuItem, Box, Divider } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -11,16 +9,15 @@ import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import { useTranslation } from "react-i18next"; // اضافه کردن i18n برای ترجمه
+import { useTranslation } from "react-i18next";
 import styles from "./AccountMenu.module.css";
 
 const AccountMenu: React.FC = () => {
-  const { t } = useTranslation(); // استفاده از hook ترجمه
+  const { t } = useTranslation(); 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { logout, isAuthenticated } = useAuth();
   const router = useRouter();
 
-  // مدیریت باز و بسته شدن منو
   const handleMouseEnter = useCallback(
     (event: React.MouseEvent<HTMLElement>) => {
       setAnchorEl(event.currentTarget);
@@ -32,7 +29,6 @@ const AccountMenu: React.FC = () => {
     setAnchorEl(null);
   }, []);
 
-  // متد خروج
   const handleLogout = useCallback(() => {
     logout();
     router.push("/auth/phone-verification");
@@ -57,7 +53,7 @@ const AccountMenu: React.FC = () => {
         }}
       >
         <AccountCircleIcon sx={{ marginRight: "5px" }} />
-        {t("account")} {/* استفاده از ترجمه برای "Account" */}
+        {t("account")}
         <ArrowDropDownIcon />
       </Button>
       <Menu
@@ -73,7 +69,7 @@ const AccountMenu: React.FC = () => {
           vertical: "top",
           horizontal: "center",
         }}
-        disableScrollLock={true} // غیرفعال کردن قفل اسکرول
+        disableScrollLock={true}
         PaperProps={{
           sx: {
             position: "absolute",
@@ -87,7 +83,7 @@ const AccountMenu: React.FC = () => {
                 onClick={handleMouseLeave}
                 className={styles.logInButton}
               >
-                {t("login")} {/* استفاده از ترجمه برای "Log In" */}
+                {t("login")}
               </MenuItem>
             </Link>
             <Link href="/auth/phone-verification" passHref>
@@ -96,7 +92,7 @@ const AccountMenu: React.FC = () => {
                 className={styles.menuItemHover}
               >
                 <PersonAddIcon sx={{ marginRight: "10px" }} />
-                {t("signUp")} {/* استفاده از ترجمه برای "Sign Up" */}
+                {t("signUp")}
               </MenuItem>
             </Link>
           </div>
@@ -104,24 +100,25 @@ const AccountMenu: React.FC = () => {
           <div>
             <MenuItem onClick={handleLogout} className={styles.menuItemHover}>
               <AccountCircleIcon sx={{ marginRight: "10px" }} />
-              {t("logout")} {/* استفاده از ترجمه برای "Logout" */}
+              {t("logout")}
             </MenuItem>
           </div>
         )}
         <Divider className={styles.divider} />
-        <MenuItem onClick={handleMouseLeave} className={styles.menuItemHover}>
-          <SettingsIcon sx={{ marginRight: "10px" }} />
-          {t("accountSettings")}{" "}
-          {/* استفاده از ترجمه برای "Account Settings" */}
-        </MenuItem>
+        <Link href="/account" passHref>
+          <MenuItem onClick={handleMouseLeave} className={styles.menuItemHover}>
+            <SettingsIcon sx={{ marginRight: "10px" }} />
+            {t("accountSettings")}
+          </MenuItem>
+        </Link>
         <Divider className={styles.divider} />
         <MenuItem onClick={handleMouseLeave} className={styles.menuItemHover}>
           <SupportIcon sx={{ marginRight: "10px" }} />
-          {t("support")} {/* استفاده از ترجمه برای "Support" */}
+          {t("support")}
         </MenuItem>
         <MenuItem onClick={handleMouseLeave} className={styles.menuItemHover}>
           <ShopIcon sx={{ marginRight: "10px" }} />
-          {t("shop")} {/* استفاده از ترجمه برای "Shop" */}
+          {t("shop")}
         </MenuItem>
       </Menu>
     </Box>

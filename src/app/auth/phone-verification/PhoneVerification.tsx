@@ -6,6 +6,9 @@ const baseURL = 'http://localhost:3001';
 
 export default function PhoneVerification() {
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState(''); // اضافه کردن فیلد ایمیل
+  const [address, setAddress] = useState(''); // اضافه کردن فیلد آدرس
+  const [fullname, setFullname] = useState(''); // اضافه کردن فیلد نام کامل
   const [code, setCode] = useState('');
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [isCodeConfirmed, setIsCodeConfirmed] = useState(false);
@@ -16,12 +19,13 @@ export default function PhoneVerification() {
   const sendPhone = async () => {
     setLoading(true);
     try {
-      const response = await axios.post(`${baseURL}/auth/verify-phone`, { phone });
-      console.log('Server response:', response.data); // اضافه کردن لاگ برای بررسی پاسخ سرور
+      // ارسال درخواست با فیلدهای اضافی
+      const response = await axios.post(`${baseURL}/auth/verify-phone`, { phone, email, address, fullname });
+      console.log('Server response:', response.data);
       setIsCodeSent(true);
       setError('');
     } catch (err) {
-      console.error('Error sending verification code:', err); // لاگ کردن خطا
+      console.error('Error sending verification code:', err);
       setError('Failed to send verification code');
     } finally {
       setLoading(false);
@@ -34,10 +38,16 @@ export default function PhoneVerification() {
     try {
       const response = await axios.post(`${baseURL}/auth/confirm-code`, { phone, code });
       if (response.data.accessToken) {
-        // ذخیره توکن در localStorage
         localStorage.setItem('token', response.data.accessToken);
+        localStorage.setItem('phone', phone);
+        
+        // ذخیره اطلاعات اضافی کاربر
+        localStorage.setItem('email', response.data.user.email || '');
+        localStorage.setItem('address', response.data.user.address || '');
+        localStorage.setItem('fullname', response.data.user.fullname || '');
+        
         setIsCodeConfirmed(true);
-        setToken(response.data.accessToken); // ذخیره توکن در state
+        setToken(response.data.accessToken);
         setError('');
       } else {
         setError('Invalid code or failed to login');
@@ -48,11 +58,11 @@ export default function PhoneVerification() {
       setLoading(false);
     }
   };
+  
 
   useEffect(() => {
     if (isCodeConfirmed) {
-      // هدایت کاربر به صفحه‌ی مورد نظر بعد از تایید کد و دریافت توکن
-      window.location.href = '/'; // به مسیر دلخواه هدایت کنید
+      window.location.href = '/account'; // هدایت به صفحه حساب کاربری بعد از تایید
     }
   }, [isCodeConfirmed]);
 
@@ -68,6 +78,27 @@ export default function PhoneVerification() {
               placeholder="Enter your phone number"
               value={phone}
               onChange={(e) => setPhone(e.target.value)} 
+              className={styles.input}
+            />
+            <input 
+              type="text" 
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)} 
+              className={styles.input}
+            />
+            <input 
+              type="text" 
+              placeholder="Enter your address"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)} 
+              className={styles.input}
+            />
+            <input 
+              type="text" 
+              placeholder="Enter your full name"
+              value={fullname}
+              onChange={(e) => setFullname(e.target.value)} 
               className={styles.input}
             />
             <button onClick={sendPhone} className={styles.button} disabled={loading}>

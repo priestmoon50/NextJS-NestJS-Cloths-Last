@@ -17,6 +17,16 @@ export class User {
   @Prop({ default: false })  // اضافه کردن فیلد وضعیت تایید کاربر
   isVerified: boolean;
 
+  // فیلدهای جدید برای ایمیل، آدرس، و نام کامل
+  @Prop({ required: false })  // ایمیل اختیاری
+  email?: string;
+
+  @Prop({ required: false })  // آدرس اختیاری
+  address?: string;
+
+  @Prop({ required: false })  // نام کامل اختیاری
+  fullname?: string;
+
   _id?: Types.ObjectId; // اختیاری کردن _id
 }
 
