@@ -29,10 +29,9 @@ const CheckoutPage: React.FC = () => {
   const router = useRouter();
   const { isAuthenticated } = useAuth(); 
   const [userData, setUserData] = useState({ name: "", phone: "", userId: "" });
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasError, setHasError] = useState(false);
+
   const [openModal, setOpenModal] = useState(false); // حالت مودال
-  const [canPlaceOrder, setCanPlaceOrder] = useState(false); // بررسی اینکه آیا سفارش قابل ارسال است یا خیر
+
 
   const {
     handleSubmit,
@@ -42,34 +41,7 @@ const CheckoutPage: React.FC = () => {
     resolver: yupResolver(validationSchema),
   });
 
-  // گرفتن اطلاعات کاربر اگر وارد شده باشد
-  useEffect(() => {
-    const token = TokenService.getToken();
-    console.log("Token from localStorage:", token);
-    if (token) {
-      setIsLoading(true);
-      fetch("/api/users/me", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-        .then((res) => {
-          if (!res.ok) throw new Error("Failed to fetch user data");
-          return res.json();
-        })
-        .then((data) => {
-          console.log("User data from API:", data);
-          setUserData({ name: data.name, phone: data.phone, userId: data.id });
-          setIsLoading(false);
-        })
-        .catch((error) => {
-          console.error("Error fetching user data:", error);
-          setHasError(true);
-          setIsLoading(false);
-        });
-    }
-  }, []);
+
 
   // بررسی وضعیت ورود و بستن مودال
   useEffect(() => {
