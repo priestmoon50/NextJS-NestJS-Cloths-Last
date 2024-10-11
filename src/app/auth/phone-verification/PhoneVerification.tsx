@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import styles from './PhoneVerification.module.css';
@@ -19,7 +21,6 @@ export default function PhoneVerification() {
   const sendPhone = async () => {
     setLoading(true);
     try {
-      // ارسال درخواست با فیلدهای اضافی
       const response = await axios.post(`${baseURL}/auth/verify-phone`, { phone, email, address, fullname });
       console.log('Server response:', response.data);
       setIsCodeSent(true);
@@ -31,7 +32,6 @@ export default function PhoneVerification() {
       setLoading(false);
     }
   };
-  
 
   const verifyCode = async () => {
     setLoading(true);
@@ -58,7 +58,6 @@ export default function PhoneVerification() {
       setLoading(false);
     }
   };
-  
 
   useEffect(() => {
     if (isCodeConfirmed) {
@@ -80,6 +79,7 @@ export default function PhoneVerification() {
               onChange={(e) => setPhone(e.target.value)} 
               className={styles.input}
             />
+            <div className={styles.optionalLabel}>Optional</div>
             <input 
               type="text" 
               placeholder="Enter your email"
@@ -87,6 +87,7 @@ export default function PhoneVerification() {
               onChange={(e) => setEmail(e.target.value)} 
               className={styles.input}
             />
+            <div className={styles.optionalLabel}>Optional</div>
             <input 
               type="text" 
               placeholder="Enter your address"
@@ -94,6 +95,7 @@ export default function PhoneVerification() {
               onChange={(e) => setAddress(e.target.value)} 
               className={styles.input}
             />
+            <div className={styles.optionalLabel}>Optional</div>
             <input 
               type="text" 
               placeholder="Enter your full name"
