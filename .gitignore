@@ -45,6 +45,16 @@ jspm_packages/
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
 
+
+# Ignore node_modules directory
+node_modules/
+
+# Ignore public directory
+public/
+
+# Ignore PNG files in public directory
+public/*.png
+
 # TypeScript cache
 *.tsbuildinfo
 
