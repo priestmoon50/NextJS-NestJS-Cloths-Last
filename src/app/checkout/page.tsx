@@ -17,8 +17,8 @@ import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useAuth } from "@/context/AuthContext";
-import TokenService from "@/utils/TokenService"; 
-import SignInModal from "@/components/SignInModal"; 
+import TokenService from "@/utils/TokenService";
+import SignInModal from "@/components/SignInModal";
 
 const validationSchema = yup.object().shape({
   address: yup.string().required("Address is required"),
@@ -27,65 +27,126 @@ const validationSchema = yup.object().shape({
 const CheckoutPage: React.FC = () => {
   const { cart, removeItem, updateItem } = useCart();
   const router = useRouter();
-  const { isAuthenticated } = useAuth(); 
-  const [userData, setUserData] = useState({ name: "", phone: "", userId: "" });
+  const { isAuthenticated } = useAuth();
+  const [userData, setUserData] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    userId: "",
+  });
 
   const [openModal, setOpenModal] = useState(false); // حالت مودال
-
 
   const {
     handleSubmit,
     control,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
   });
 
-
-
   // بررسی وضعیت ورود و بستن مودال
   useEffect(() => {
     if (isAuthenticated) {
-      setOpenModal(false);
+      const storedName = localStorage.getItem("fullname");
+      const storedPhone = localStorage.getItem("phone");
+      const storedEmail = localStorage.getItem("email"); // اضافه کردن ایمیل
+      const storedAddress = localStorage.getItem("address");
+      const userId = localStorage.getItem("userId");
+
+      setUserData({
+        name: storedName || "",
+        phone: storedPhone || "",
+        email: storedEmail || "", // ایمیل کاربر
+        userId: userId || "",
+      });
+
+      if (storedAddress) {
+        setValue("address", storedAddress);
+      }
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, setValue]);
+
+  // ذخیره اطلاعات کاربر جدید در دیتابیس
+  const saveUserDataToServer = async () => {
+    try {
+      const userUpdateData = {
+        userId: userData.userId,
+        name: userData.name,
+        phone: userData.phone,
+        address: localStorage.getItem("address"),
+      };
+
+      const response = await fetch("/api/users/update", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userUpdateData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update user data");
+      }
+    } catch (error) {
+      console.error("Error updating user data:", error);
+    }
+  };
 
   // مدیریت دکمه Place Order
   const handlePlaceOrder = async (data: any) => {
     if (!isAuthenticated) {
-      setOpenModal(true); // اگر کاربر وارد نشده باشد، مودال باز می‌شود
+      setOpenModal(true);
       return;
     }
 
-    // در صورت وارد شدن کاربر، ادامه پروسه سفارش
+    if (cart.items.length === 0) {
+      alert("Your cart is empty!");
+      return;
+    }
+
+    if (!userData.name || !userData.phone) {
+      alert("Please complete all required fields.");
+      return;
+    }
+
+    // ذخیره اطلاعات کاربر جدید در صورت نیاز
+    await saveUserDataToServer();
+
     try {
       const orderData = {
         userId: userData.userId,
         items: cart.items,
-        totalPrice: cart.items.reduce((acc, item) => acc + item.price * item.quantity, 0),
+        totalPrice: cart.items.reduce(
+          (acc, item) => acc + item.price * item.quantity,
+          0
+        ),
         name: userData.name,
         address: data.address,
         phone: userData.phone,
-        status: 'Pending',
+        status: "Pending",
       };
 
       console.log("Order data being sent to API:", orderData);
 
-      const response = await fetch('/api/orders', {
-        method: 'POST',
+      const response = await fetch("/api/orders", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(orderData),
       });
 
       if (response.ok) {
-        router.push('/confirmation');
+        router.push("/confirmation");
       } else {
-        console.error('Failed to place order');
+        console.error("Failed to place order");
+        alert("There was an error placing your order. Please try again.");
       }
     } catch (error) {
-      console.error('Error placing order:', error);
+      console.error("Error placing order:", error);
+      alert("An unexpected error occurred. Please try again later.");
     }
   };
 
@@ -107,9 +168,16 @@ const CheckoutPage: React.FC = () => {
             fullWidth
             label="Name"
             value={userData.name || ""}
-            InputProps={{
-              readOnly: isAuthenticated,
-            }}
+            onChange={(e) => setUserData({ ...userData, name: e.target.value })}
+            sx={{ marginBottom: "10px" }}
+          />
+          <TextField
+            fullWidth
+            label="Email"
+            value={userData.email || ""}
+            onChange={(e) =>
+              setUserData({ ...userData, email: e.target.value })
+            }
             sx={{ marginBottom: "10px" }}
           />
           <Controller
@@ -157,7 +225,9 @@ const CheckoutPage: React.FC = () => {
                 >
                   <ListItemText
                     primary={`${item.name} - $${item.price} x ${item.quantity}`}
-                    secondary={`Size: ${item.size || "N/A"}, Color: ${item.color || "N/A"}`}
+                    secondary={`Size: ${item.size || "N/A"}, Color: ${
+                      item.color || "N/A"
+                    }`}
                   />
 
                   <Box>
