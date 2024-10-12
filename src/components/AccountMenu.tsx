@@ -31,9 +31,11 @@ const AccountMenu: React.FC = () => {
 
   const handleLogout = useCallback(() => {
     logout();
-    router.push("/auth/phone-verification");
-  }, [logout, router]);
-
+    localStorage.removeItem('cart'); // پاک کردن سبد خرید از localStorage
+    window.location.reload(); // رفرش کل صفحه
+  }, [logout]);
+  
+  
   return (
     <Box
       onMouseEnter={handleMouseEnter}

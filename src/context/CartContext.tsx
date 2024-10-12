@@ -28,14 +28,14 @@ const initialState: CartState = {
 
 // Actions
 type Action =
-  | { type: 'SET_ITEMS'; payload: CartItem[] } // اضافه کردن اکشنی برای تنظیم کل آیتم‌ها
+  | { type: 'SET_ITEMS'; payload: CartItem[] } 
   | { type: 'ADD_ITEM'; payload: CartItem }
   | { type: 'REMOVE_ITEM'; payload: string }
   | { type: 'UPDATE_ITEM'; payload: { id: string; quantity: number } };
 
 const cartReducer = (state: CartState, action: Action): CartState => {
   switch (action.type) {
-    case 'SET_ITEMS': // تنظیم کل آیتم‌ها
+    case 'SET_ITEMS':
       return { ...state, items: action.payload };
     case 'ADD_ITEM':
       return { ...state, items: [...state.items, action.payload] };
@@ -59,23 +59,69 @@ const CartContext = createContext<CartContextProps | undefined>(undefined);
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cart, dispatch] = useReducer(cartReducer, initialState);
   const [isMounted, setIsMounted] = useState(false);
+  const [user, setUser] = useState<string | null>(null);
 
-  // فقط پس از بارگذاری کلاینت localStorage را بخوانید
+  // خواندن localStorage و تنظیم کاربر پس از بارگذاری
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const localData = localStorage.getItem('cart');
+      const token = localStorage.getItem('token');
       if (localData) {
-        dispatch({ type: 'SET_ITEMS', payload: JSON.parse(localData) }); // بازیابی کل آیتم‌ها
+        dispatch({ type: 'SET_ITEMS', payload: JSON.parse(localData) });
       }
+      if (token) {
+        setUser(token); // تنظیم کاربر پس از بارگذاری
+      }
+      setIsMounted(true);
     }
-    setIsMounted(true);
   }, []);
 
+  // ذخیره‌سازی سبد خرید در سرور برای کاربر لاگین کرده
   useEffect(() => {
-    if (isMounted && typeof window !== 'undefined') {
-      localStorage.setItem('cart', JSON.stringify(cart.items)); // ذخیره‌سازی فقط آیتم‌ها
+    const saveCartToServer = async (cartItems: CartItem[]) => {
+      if (user) {
+        try {
+          await fetch('/api/cart', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(cartItems),
+          });
+        } catch (error) {
+          console.error('Failed to save cart to server:', error);
+        }
+      }
+    };
+
+    if (user) {
+      saveCartToServer(cart.items);
     }
-  }, [cart.items, isMounted]); // فقط زمانی که آیتم‌ها تغییر می‌کنند، ذخیره‌سازی انجام می‌شود
+  }, [cart.items, user]);
+
+  // بازیابی سبد خرید از سرور پس از ورود کاربر
+  useEffect(() => {
+    const fetchCartFromServer = async () => {
+      if (user) {
+        try {
+          const response = await fetch('/api/cart');
+          const savedCart = await response.json();
+          dispatch({ type: 'SET_ITEMS', payload: savedCart });
+        } catch (error) {
+          console.error('Failed to fetch cart from server:', error);
+        }
+      }
+    };
+
+    if (user) {
+      fetchCartFromServer();
+    }
+  }, [user]);
+
+  // ذخیره‌سازی سبد خرید در localStorage
+  useEffect(() => {
+    if (isMounted) {
+      localStorage.setItem('cart', JSON.stringify(cart.items)); 
+    }
+  }, [cart.items, isMounted]);
 
   const addItem = (item: CartItem) => {
     dispatch({ type: 'ADD_ITEM', payload: item });
@@ -90,7 +136,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   if (!isMounted) {
-    return null; // جلوگیری از رندر تا زمان بارگذاری کامل
+    return null; 
   }
 
   return (
