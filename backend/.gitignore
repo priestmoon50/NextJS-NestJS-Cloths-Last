@@ -15,6 +15,12 @@ lerna-debug.log*
 # OS
 .DS_Store
 
+# Ignore public directory
+/public
+
+# Ignore PNG files in public directory
+public/*.png
+
 # Tests
 /coverage
 /.nyc_output
