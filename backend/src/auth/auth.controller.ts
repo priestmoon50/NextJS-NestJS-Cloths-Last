@@ -114,6 +114,7 @@ async confirmCode(@Body() { phone, code }: { phone: string; code: string }) {
       email: user.email,
       address: user.address,
       fullname: user.fullname,
+      role: user.role 
     },
   };
 }
@@ -174,6 +175,7 @@ async loginConfirm(@Body() { phone, code }: { phone: string; code: string }) {
       email: user.email,
       address: user.address,
       fullname: user.fullname,
+      role: user.role 
     },
   };
 }

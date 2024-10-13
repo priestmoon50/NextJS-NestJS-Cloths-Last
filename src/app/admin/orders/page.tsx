@@ -6,6 +6,7 @@ import { Container, Typography, Snackbar, Alert } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import OrdersList, { OrdersListProps } from './OrdersList';
 import { Order } from '@/data/types';
+import withAdminAccess from '@/hoc/withAdminAccess';
 
 const fetchOrders = async (): Promise<Order[]> => {
   const response = await fetch('/api/orders'); // فرض می‌کنیم API داریم
@@ -62,4 +63,4 @@ const OrdersPage: React.FC = () => {
   );
 };
 
-export default OrdersPage;
+export default withAdminAccess(OrdersPage);

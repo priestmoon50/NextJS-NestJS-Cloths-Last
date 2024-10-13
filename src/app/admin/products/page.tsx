@@ -6,6 +6,7 @@ import ProductsList from "./ProductsList";
 import AddProductForm from "./AddProductForm";
 import { Product } from "@/data/types";
 import ImageUpload from "./ImageUpload"; // ایمپورت کامپوننت ImageUpload
+import withAdminAccess from '@/hoc/withAdminAccess';
 
 const ProductsPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]); // لیست محصولات بدون داده‌های تستی
@@ -66,4 +67,4 @@ const ProductsPage: React.FC = () => {
   );
 };
 
-export default ProductsPage;
+export default withAdminAccess (ProductsPage);

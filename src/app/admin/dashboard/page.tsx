@@ -4,7 +4,7 @@
 import React from 'react';
 import { Container, Typography } from '@mui/material';
 import Dashboard from './Dashboard';
-
+import withAdminAccess from '@/hoc/withAdminAccess';
 
 // یاد آوری مهم  بعدا این بخش رو اگر نیاز بود اضافه میکنم
 
@@ -35,4 +35,4 @@ const AdminDashboardPage: React.FC = () => {
   );
 };
 
-export default AdminDashboardPage;
+export default withAdminAccess (AdminDashboardPage);

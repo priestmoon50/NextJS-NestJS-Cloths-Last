@@ -1,7 +1,10 @@
-// src/admin/index.tsx
+// src/admin/page.tsx
+'use client';
 import React, { Suspense } from 'react';
 import { Container, Grid, Paper, Typography, Button } from '@mui/material';
 import Link from 'next/link';
+import withAdminAccess from '@/hoc/withAdminAccess'; // استفاده از @ برای ایمپورت
+
 
 const OrdersPage = React.lazy(() => import('./orders/page'));
 const ProductsPage = React.lazy(() => import('./products/page'));
@@ -58,4 +61,4 @@ const AdminDashboard: React.FC = () => {
   );
 };
 
-export default AdminDashboard;
+export default withAdminAccess(AdminDashboard);

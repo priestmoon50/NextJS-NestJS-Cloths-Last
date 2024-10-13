@@ -181,12 +181,13 @@ async createTemporaryUser(phone: string, otp: string, otpExpiryTime: number, ema
       if (!user) {
         throw new NotFoundException(`User with ID ${id} not found.`);
       }
-      return user;
+      return user;  // user.role به درستی باید برگردانده شود
     } catch (error) {
       this.logger.error(`Failed to fetch user with ID ${id}: ${error.message}`);
       throw new NotFoundException(`Failed to fetch user with ID ${id}.`);
     }
   }
+  
 
   async update(id: string, userData: { phone?: string }): Promise<User> {
     try {

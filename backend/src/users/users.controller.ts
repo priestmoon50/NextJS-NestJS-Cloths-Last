@@ -23,7 +23,8 @@ export class UsersController {
       phone: user.phone,
       email: user.email || '',  // اگر خالی است، یک مقدار پیش‌فرض (مثل رشته خالی) برگردانید
       address: user.address || '',
-      fullname: user.fullname || ''
+      fullname: user.fullname || '',
+      role: user.role || 'user'
     };
   }
 
@@ -32,15 +33,17 @@ export class UsersController {
   @Patch('assign-role/:id')
   @HttpCode(HttpStatus.OK)
   async assignRole(
-    @Param('id') id: string,  // دریافت id کاربر از URL
-    @Body() roleData: { role: 'user' | 'admin' },  // دریافت نقش جدید از بدنه درخواست
+    @Param('id') id: string,  
+    @Body() roleData: { role: 'user' | 'admin' },  
   ) {
     const updatedUser = await this.usersService.assignRole(id, roleData.role);
     return {
       message: 'User role updated successfully',
       user: updatedUser,
+      role: updatedUser.role  // اضافه کردن نقش جدید به پاسخ
     };
   }
+
 
 
   // دریافت اطلاعات کاربر با استفاده از ID
