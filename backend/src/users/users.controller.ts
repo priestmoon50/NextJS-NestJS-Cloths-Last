@@ -27,6 +27,21 @@ export class UsersController {
     };
   }
 
+  
+// با استفاده از role میتونیم هر کدوم از کاربر هایی رو که خواستیم به  بهشون role ادمین بدیم تا به بقیه بخش های admin panel دسترسی داشته باشند
+  @Patch('assign-role/:id')
+  @HttpCode(HttpStatus.OK)
+  async assignRole(
+    @Param('id') id: string,  // دریافت id کاربر از URL
+    @Body() roleData: { role: 'user' | 'admin' },  // دریافت نقش جدید از بدنه درخواست
+  ) {
+    const updatedUser = await this.usersService.assignRole(id, roleData.role);
+    return {
+      message: 'User role updated successfully',
+      user: updatedUser,
+    };
+  }
+
 
   // دریافت اطلاعات کاربر با استفاده از ID
   @Get(':id')

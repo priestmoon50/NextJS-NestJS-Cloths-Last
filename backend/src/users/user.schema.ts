@@ -6,28 +6,35 @@ export type UserDocument = User & Document;
 @Schema()
 export class User {
   @Prop({ required: true, unique: true })
-  phone: string;  // شماره تلفن به عنوان شناسه یکتا
+  phone: string;
 
-  @Prop()  // اضافه کردن فیلد برای ذخیره کد تایید
+  @Prop()
   otp: string;
 
-  @Prop()  // اضافه کردن فیلد برای ذخیره زمان انقضای OTP
+  @Prop()
   otpExpiryTime: number;
 
-  @Prop({ default: false })  // اضافه کردن فیلد وضعیت تایید کاربر
+  @Prop({ default: false })
   isVerified: boolean;
 
-  // فیلدهای جدید برای ایمیل، آدرس، و نام کامل
-  @Prop({ required: false })  // ایمیل اختیاری
+  @Prop({ required: false })
   email?: string;
 
-  @Prop({ required: false })  // آدرس اختیاری
+  @Prop({ required: false })
   address?: string;
 
-  @Prop({ required: false })  // نام کامل اختیاری
+  @Prop({ required: false })
   fullname?: string;
 
-  _id?: Types.ObjectId; // اختیاری کردن _id
+  // اضافه کردن فیلد role برای تعیین نقش کاربر
+  @Prop({
+    type: String,
+    enum: ['user', 'admin'],  // فقط دو مقدار user و admin را قبول می‌کند
+    default: 'user',  // به صورت پیش‌فرض نقش کاربر user است
+  })
+  role: string;
+
+  _id?: Types.ObjectId; 
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

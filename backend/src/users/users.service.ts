@@ -11,19 +11,20 @@ export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
 // ایجاد کاربر جدید با فیلدهای اضافی
-async create(userData: { phone: string, email?: string, address?: string, fullname?: string }): Promise<User> {
+async create(userData: { phone: string, email?: string, address?: string, fullname?: string, role?: string }): Promise<User> {
   try {
     const existingUser = await this.userModel.findOne({ phone: userData.phone }).exec();
     if (existingUser) {
       throw new ConflictException('Phone number already registered.');
     }
 
-    // ایجاد کاربر جدید با داده‌های اضافی
+    // ایجاد کاربر جدید با نقش پیش‌فرض 'user' یا نقش وارد شده
     const createdUser = new this.userModel({
       phone: userData.phone,
       email: userData.email,
       address: userData.address,
       fullname: userData.fullname,
+      role: userData.role || 'user',  // اگر نقشی تعیین نشده بود، پیش‌فرض 'user'
     });
     return await createdUser.save();
   } catch (error) {
@@ -31,6 +32,25 @@ async create(userData: { phone: string, email?: string, address?: string, fullna
     throw new NotFoundException('Failed to create user. Please try again.');
   }
 }
+
+ // متد برای تغییر نقش کاربر
+ async assignRole(userId: string, newRole: 'user' | 'admin'): Promise<User> {
+  const user = await this.userModel.findById(userId).exec();
+  if (!user) {
+    throw new NotFoundException('User not found');
+  }
+ // تغییر نقش کاربر
+ user.role = newRole;
+ try {
+   return await user.save();
+ } catch (error) {
+   this.logger.error(`Failed to assign role: ${error.message}`);
+   throw new NotFoundException('Failed to assign role.');
+ }
+}
+
+
+
 
 // به‌روزرسانی اطلاعات کاربر شامل ایمیل، آدرس و نام کامل
 async updateUserInfo(phone: string, email?: string, address?: string, fullname?: string): Promise<User> {
