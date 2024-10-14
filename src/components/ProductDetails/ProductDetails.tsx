@@ -20,6 +20,7 @@ import { Product } from "@/data/types";
 import Link from "next/link";
 import styles from "./ProductDetails.module.css"; // ایمپورت فایل CSS module
 import SizeGuide from "./SizeGuide";
+import { useCart } from "@/context/CartContext";
 
 const ProductDetails: FC<{ product: Product }> = ({ product }) => {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
@@ -28,15 +29,45 @@ const ProductDetails: FC<{ product: Product }> = ({ product }) => {
   const [openSizeGuide, setOpenSizeGuide] = useState(false);
   const [liked, setLiked] = useState(false); // وضعیت پسندیدن
 
+  const { addItem } = useCart();
+  
   const imagesArray = product.images ? product.images : [product.image];
 
   const handleOpenSizeGuide = () => setOpenSizeGuide(true);
   const handleCloseSizeGuide = () => setOpenSizeGuide(false);
 
+  
   // تابع برای تغییر وضعیت پسندیدن
   const toggleLike = () => {
     setLiked((prevLiked) => !prevLiked);
   };
+
+
+  const handleAddToCart = () => {
+    const productId = product.id || product._id; // بررسی هر دو فیلد id و _id
+  
+    if (!productId) {
+      console.error("Product ID is undefined");
+      return;
+    }
+  
+    if (!selectedSize || !selectedColor) {
+      alert("Please select a size and color");
+      return;
+    }
+    console.log(product);
+
+    addItem({
+      id: productId.toString(),
+      name: product.name,
+      price: product.price,
+      quantity: quantity,
+      size: selectedSize,
+      color: selectedColor,
+    });
+  };
+  
+
 
   return (
     <Container maxWidth="lg" className={styles.container}>
@@ -144,9 +175,15 @@ const ProductDetails: FC<{ product: Product }> = ({ product }) => {
             />
           </Box>
 
+         <Box sx={{ mt: 2 }}>
+            <Button variant="contained"  className={styles.backButton} color="primary" onClick={handleAddToCart}>
+              Add to Cart
+            </Button>
+          </Box>
+
           {/* نمایش راهنمای اندازه */}
           <Box sx={{ mt: 2 }}>
-            <Button variant="contained" onClick={handleOpenSizeGuide}>
+            <Button variant="contained" className={styles.backButton} onClick={handleOpenSizeGuide}>
               Size Info
             </Button>
             <Modal
@@ -171,10 +208,13 @@ const ProductDetails: FC<{ product: Product }> = ({ product }) => {
                   <Typography>Sizes are not available!</Typography>
                 )}
                 <Button onClick={handleCloseSizeGuide} sx={{ mt: 2 }}>
-                  بستن
+                  Close
                 </Button>
+
+                
               </Box>
             </Modal>
+            
           </Box>
         </Grid>
       </Grid>
