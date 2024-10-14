@@ -8,6 +8,7 @@ interface FavoriteItem {
     name: string;
     price: number;
     imageUrl: string;
+    images?: string[];
   }
   
 

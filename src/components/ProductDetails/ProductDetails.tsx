@@ -45,27 +45,34 @@ const ProductDetails: FC<{ product: Product }> = ({ product }) => {
   // تابع برای تغییر وضعیت پسندیدن
   const toggleLike = () => {
     const productId = (product.id || product._id)?.toString();
-
+  
     if (!productId) {
       console.error("Product ID is undefined");
       console.log("Favorites:", favorites.items);
       console.log("Is Liked:", isLiked);
       return;
     }
-
+  
+    const favoriteItem = {
+      id: productId,
+      name: product.name,
+      price: product.price,
+      imageUrl: product.images && product.images.length > 0 ? product.images[0] : '/placeholder.jpg', // استفاده از اولین تصویر یا placeholder
+      images: product.images || [], // ارسال کل آرایه تصاویر
+      description: product.description || '', // ارسال توضیحات
+      category: product.category || 'N/A', // ارسال کتگوری
+    };
+  
     if (isLiked) {
       removeFavorite(productId);
-      console.log("Removed from favorites:", favorites); // بررسی favorites بعد از حذف
+      console.log("Removed from favorites:", favorites); 
     } else {
-      addFavorite({
-        id: productId,
-        name: product.name,
-        price: product.price,
-        imageUrl: product.image,
-      });
-      console.log("Added to favorites:", favorites); // بررسی favorites بعد از اضافه شدن
+      addFavorite(favoriteItem);
+      console.log("Added to favorites:", favorites);
     }
   };
+  
+  
 
   const handleAddToCart = () => {
     const productId = product.id || product._id; // بررسی هر دو فیلد id و _id
