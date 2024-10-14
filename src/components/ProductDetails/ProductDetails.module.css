@@ -17,6 +17,20 @@
     color: white;
   }
   
+
+  .inputNoArrows {
+    appearance: none; /* Standard property */
+    -webkit-appearance: none; /* Chrome, Safari, Opera */
+    -moz-appearance: textfield; /* Firefox */
+  }
+  
+  .inputNoArrows::-webkit-outer-spin-button,
+  .inputNoArrows::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  
+
   .productInfo {
     padding-left: 20px;
   }

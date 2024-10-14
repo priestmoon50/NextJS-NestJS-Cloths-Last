@@ -4,7 +4,7 @@
   max-width: 400px; /* حداکثر عرض */
   margin: 50px auto; /* فاصله از بالا و مرکز */
   padding: 40px; /* فضای داخلی بیشتر */
-  border-radius: 12px; /* حاشیه گرد */
+
   background-color: #ffffff; /* پس‌زمینه سفید */
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1); /* سایه ملایم */
   transition: box-shadow 0.3s ease; /* افکت سایه نرم */
@@ -40,7 +40,7 @@
   font-size: 16px; /* سایز فونت */
   margin-bottom: 10px; /* فاصله بین ورودی‌ها */
   border: 1px solid #dcdcdc; /* حاشیه ملایم */
-  border-radius: 8px; /* حاشیه نرم */
+
   transition: border-color 0.3s ease; /* افکت تغییر رنگ حاشیه */
 }
 
@@ -55,7 +55,7 @@
   background-color: #007bff; /* رنگ پس‌زمینه دکمه */
   color: white; /* رنگ متن */
   border: none; /* بدون حاشیه */
-  border-radius: 8px; /* حاشیه نرم */
+  border-radius: 2px; /* حاشیه نرم */
   cursor: pointer; /* نشانه گر ماوس */
   transition: background-color 0.3s ease, transform 0.2s; /* افکت تغییر رنگ و حرکت */
   width: 100%; /* عرض کامل */
@@ -93,7 +93,7 @@
   color: white; /* رنگ متن */
   padding: 10px; /* فضای داخلی */
   border: none; /* بدون حاشیه */
-  border-radius: 8px; /* حاشیه نرم */
+  
   cursor: pointer; /* نشانه گر ماوس */
   transition: background-color 0.3s ease; /* افکت تغییر رنگ */
 }
