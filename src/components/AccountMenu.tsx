@@ -11,6 +11,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import styles from "./AccountMenu.module.css";
+import FavoriteIcon from '@mui/icons-material/Favorite';
 
 const AccountMenu: React.FC = () => {
   const { t } = useTranslation(); 
@@ -97,6 +98,15 @@ const AccountMenu: React.FC = () => {
                 {t("signUp")}
               </MenuItem>
             </Link>
+            <Link href="/favorites" passHref>
+              <MenuItem
+                onClick={handleMouseLeave}
+                className={styles.menuItemHover}
+              >
+                <FavoriteIcon sx={{ marginRight: "10px" }} />
+                {t("favorites")}
+              </MenuItem>
+            </Link>
           </div>
         ) : (
           <div>
@@ -125,6 +135,6 @@ const AccountMenu: React.FC = () => {
       </Menu>
     </Box>
   );
-};
+}
 
 export default AccountMenu;

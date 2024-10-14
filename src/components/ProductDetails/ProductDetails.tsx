@@ -21,7 +21,7 @@ import Link from "next/link";
 import styles from "./ProductDetails.module.css"; // ایمپورت فایل CSS module
 import SizeGuide from "./SizeGuide";
 import { useCart } from "@/context/CartContext";
-
+import { useFavorites } from "@/context/FavoriteContext";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
 
@@ -30,7 +30,10 @@ const ProductDetails: FC<{ product: Product }> = ({ product }) => {
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [quantity, setQuantity] = useState<number>(1); // انتخاب تعداد پیش‌فرض
   const [openSizeGuide, setOpenSizeGuide] = useState(false);
-  const [liked, setLiked] = useState(false); // وضعیت پسندیدن
+  const { addFavorite, removeFavorite, favorites } = useFavorites();
+  const isLiked = favorites.items.some(
+    (item) => item.id === product.id || item.id === product._id
+  );
 
   const { addItem } = useCart();
 
@@ -41,7 +44,27 @@ const ProductDetails: FC<{ product: Product }> = ({ product }) => {
 
   // تابع برای تغییر وضعیت پسندیدن
   const toggleLike = () => {
-    setLiked((prevLiked) => !prevLiked);
+    const productId = (product.id || product._id)?.toString();
+
+    if (!productId) {
+      console.error("Product ID is undefined");
+      console.log("Favorites:", favorites.items);
+      console.log("Is Liked:", isLiked);
+      return;
+    }
+
+    if (isLiked) {
+      removeFavorite(productId);
+      console.log("Removed from favorites:", favorites); // بررسی favorites بعد از حذف
+    } else {
+      addFavorite({
+        id: productId,
+        name: product.name,
+        price: product.price,
+        imageUrl: product.image,
+      });
+      console.log("Added to favorites:", favorites); // بررسی favorites بعد از اضافه شدن
+    }
   };
 
   const handleAddToCart = () => {
@@ -103,27 +126,34 @@ const ProductDetails: FC<{ product: Product }> = ({ product }) => {
 
           <ProductPrice price={product.price} discount={product.discount} />
 
+          <Typography variant="body2" className={styles.productDescription}>
+            {product.description}
+          </Typography>
+
+          <Typography variant="body2">
+            <br />
+            Category: {product.category || "N/A"}
+          </Typography>
+
           {/* آیکون قلب برای افزودن به لیست پسندیده‌ها */}
           <Box sx={{ mt: 2, display: "flex", alignItems: "center" }}>
-            <IconButton onClick={toggleLike}>
-              {liked ? (
+            <IconButton
+              onClick={toggleLike}
+              aria-label={
+                isLiked ? "Remove from Favorites" : "Add to Favorites"
+              }
+            >
+              {isLiked ? (
                 <FavoriteIcon color="error" />
               ) : (
                 <FavoriteBorderIcon color="error" />
               )}
             </IconButton>
             <Typography variant="body2" sx={{ ml: 1 }}>
-              {liked ? "Added to Favorites" : "Add to Favorites"}
+              {isLiked ? "Added to Favorites" : "Add to Favorites"}
             </Typography>
+
           </Box>
-
-          <Typography variant="body2" className={styles.productDescription}>
-            {product.description}
-          </Typography>
-
-          <Typography variant="body2">
-            Category: {product.category || "N/A"}
-          </Typography>
 
           {/* انتخاب سایز */}
           <Box className={styles.selectWrapper}>
@@ -147,8 +177,6 @@ const ProductDetails: FC<{ product: Product }> = ({ product }) => {
             </Select>
           </Box>
 
-
-
           {/* انتخاب رنگ */}
           <Box className={styles.selectWrapper}>
             <Typography variant="body2" className={styles.selectLabel}>
@@ -170,8 +198,6 @@ const ProductDetails: FC<{ product: Product }> = ({ product }) => {
                 ))}
             </Select>
           </Box>
-
-
 
           {/* انتخاب تعداد */}
           <Box

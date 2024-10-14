@@ -11,6 +11,7 @@ import { AuthProvider } from '@/context/AuthContext';
 import LanguageSelector from '@/components/LanguageSelector/LanguageSelector';
 import { useTranslation } from 'react-i18next';
 import '../../i18n';
+import { FavoriteProvider } from '@/context/FavoriteContext';
 
 const Layout: React.FC<{ children: React.ReactNode; dehydratedState?: unknown }> = ({ children, dehydratedState }) => {
   const [queryClient] = useState(() => new QueryClient());
@@ -28,12 +29,14 @@ const Layout: React.FC<{ children: React.ReactNode; dehydratedState?: unknown }>
           <HydrationBoundary state={dehydratedState}>
             <AuthProvider>
               <CartProvider>
+              <FavoriteProvider>
                 <LanguageSelector /> {/* LanguageSelector فقط یک‌بار ظاهر می‌شود */}
                 <NavBar />
                 <Container sx={{ minWidth: '80%' }}>
                   <Box my={4}>{children}</Box>
                 </Container>
                 <Footer />
+                </FavoriteProvider>
               </CartProvider>
             </AuthProvider>
           </HydrationBoundary>
