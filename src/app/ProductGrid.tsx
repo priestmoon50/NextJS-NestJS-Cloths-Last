@@ -1,12 +1,12 @@
 'use client';
 
-import { Container, Box, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Container, Box, Typography, useMediaQuery, useTheme, CircularProgress, Alert } from "@mui/material";
 import Image from "next/image";
 import Slider from "react-slick";
-import styles from "./ProductGrid.module.css";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Product } from "@/data/types";
+import styles from "./ProductGrid.module.css";
 
 // تابع fetch محصولات
 const fetchProducts = async (): Promise<Product[]> => {
@@ -14,7 +14,7 @@ const fetchProducts = async (): Promise<Product[]> => {
 
   // بررسی اینکه آیا API لیستی از محصولات را برمی‌گرداند
   if (Array.isArray(data)) {
-    return data.map((product: any) => ({
+    return data.map((product: Product) => ({
       ...product,
       id: product._id, // تبدیل _id به id
     }));
@@ -35,8 +35,21 @@ export default function ProductGrid() {
     queryFn: fetchProducts,
   });
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error fetching products</div>;
+  if (isLoading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" height="400px">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" height="400px">
+        <Alert severity="error">Error fetching products. Please try again later.</Alert>
+      </Box>
+    );
+  }
 
   // تنظیمات اسلایدر بر اساس سایز صفحه
   const sliderSettings = {
@@ -52,7 +65,6 @@ export default function ProductGrid() {
     centerPadding: "0", // جلوگیری از padding اضافه در حالت راست‌چین
   };
 
-
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       <Slider {...sliderSettings}>
@@ -65,14 +77,25 @@ export default function ProductGrid() {
                 fill
                 style={{ objectFit: "cover" }}
                 className={styles.productImage}
+                sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
               {product.status && (
-                <Box className={styles.productStatus}>
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: 10,
+                    left: 10,
+                    backgroundColor: "rgba(255, 0, 0, 0.8)",
+                    color: "white",
+                    padding: "5px 10px",
+                    borderRadius: "5px",
+                  }}
+                >
                   {product.status.toUpperCase()}
                 </Box>
               )}
             </Box>
-            <Typography variant="h6" component="h3">
+            <Typography variant="h6" component="h3" gutterBottom>
               {product.name}
             </Typography>
             <Typography variant="body2" color="textSecondary">

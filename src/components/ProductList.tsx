@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid } from "@mui/material";
+import { Grid, Box, CircularProgress, Alert } from "@mui/material";
 import ProductCard from "./ProductCard";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -11,7 +11,7 @@ const fetchProducts = async (): Promise<Product[]> => {
 
   // بررسی اینکه آیا API لیستی از محصولات را برمی‌گرداند
   if (Array.isArray(data)) {
-    return data.map((product: any) => ({
+    return data.map((product: Product) => ({
       ...product,
       id: product._id, // تبدیل _id به id
     }));
@@ -31,8 +31,21 @@ const ProductList: React.FC = () => {
     queryFn: fetchProducts,
   });
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error fetching products</div>;
+  if (isLoading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" height="400px">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" height="400px">
+        <Alert severity="error">Error fetching products. Please try again later.</Alert>
+      </Box>
+    );
+  }
 
   return (
     <Grid container spacing={4}>
@@ -54,7 +67,9 @@ const ProductList: React.FC = () => {
           </Grid>
         ))
       ) : (
-        <div>No products available</div>
+        <Box display="flex" justifyContent="center" alignItems="center" width="100%">
+          <Alert severity="info">No products available.</Alert>
+        </Box>
       )}
     </Grid>
   );
