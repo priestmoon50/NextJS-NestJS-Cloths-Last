@@ -34,6 +34,7 @@ bower_components
 
 # node-waf configuration
 .lock-wscript
+backend/gallery/*
 
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
@@ -41,10 +42,20 @@ build/Release
 # Dependency directories
 node_modules/
 jspm_packages/
+public/*.jpg
+public/*.jpeg
+public/*.svg
+public/*.gif
+public/*.mp4
+public/*.avi
+public/*.mov
 
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
 
+public/*.png
+*.png
+*.webp
 
 # Ignore node_modules directory
 node_modules/

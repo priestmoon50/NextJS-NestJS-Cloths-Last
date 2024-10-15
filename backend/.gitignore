@@ -1,7 +1,8 @@
 # compiled output
 /dist
-/node_modules
-/build
+/backend/dist
+/backend/node_modules
+/backend/build
 
 # Logs
 logs
@@ -18,12 +19,20 @@ lerna-debug.log*
 # Ignore public directory
 /public
 
-# Ignore PNG files in public directory
-public/*.png
+# Ignore PNG and media files in backend
+backend/gallery/*.jpg
+backend/gallery/*.png
+backend/gallery/*.webp
+backend/gallery/*.jpeg
+backend/gallery/*.svg
+backend/gallery/*.gif
+backend/gallery/*.mp4
 
-# Tests
+# Tests and temporary files
 /coverage
 /.nyc_output
+backend/tmp/
+backend/test/
 
 # IDEs and editors
 /.idea
