@@ -21,13 +21,13 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import LanguageIcon from "@mui/icons-material/Language"; // افزودن آیکون زبان
 import AccountMenu from "./AccountMenu";
 import { useCart } from "../context/CartContext";
-import { useAuth } from '@/context/AuthContext';
+
 import { useTranslation } from 'react-i18next';
 import LanguageSelector from "@/components/LanguageSelector/LanguageSelector"; // اضافه کردن کامپوننت LanguageSelector
 
 const NavBar: React.FC = () => {
   const { t } = useTranslation();
-  const { isAuthenticated } = useAuth();
+
   const isMobile = useMediaQuery("(max-width: 600px)");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [languageModalOpen, setLanguageModalOpen] = useState(false); // مدیریت حالت باز بودن مودال زبان

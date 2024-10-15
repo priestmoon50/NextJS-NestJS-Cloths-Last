@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from 'next/server';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
 export async function GET(request: NextRequest) { 
   try {
@@ -29,13 +29,16 @@ export async function GET(request: NextRequest) {
       address: userData.address || '',
       fullname: userData.fullname || '',
     });
-  } catch (error: any) { // تغییر نوع error به any
-    console.error('Error fetching user data:', error.message);
+  } catch (error) {
+    console.error('Error fetching user data:', (error as AxiosError).message);
 
     // مدیریت خطای axios با جزئیات بیشتر
-    if (error.response) {
+    if (axios.isAxiosError(error) && error.response) {
       console.error('Error details:', error.response.data);
-      return NextResponse.json({ error: 'Failed to fetch user data', details: error.response.data }, { status: error.response.status });
+      return NextResponse.json(
+        { error: 'Failed to fetch user data', details: error.response.data }, 
+        { status: error.response.status }
+      );
     } else {
       return NextResponse.json({ error: 'Failed to fetch user data' }, { status: 500 });
     }

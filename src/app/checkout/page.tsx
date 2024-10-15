@@ -17,12 +17,17 @@ import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useAuth } from "@/context/AuthContext";
-import TokenService from "@/utils/TokenService";
 import SignInModal from "@/components/SignInModal";
 
+// تعریف schema برای اعتبارسنجی فرم
 const validationSchema = yup.object().shape({
   address: yup.string().required("Address is required"),
 });
+
+// تعریف نوع دقیق داده‌هایی که از فرم دریافت می‌کنیم
+interface FormData {
+  address: string;
+}
 
 const CheckoutPage: React.FC = () => {
   const { cart, removeItem, updateItem } = useCart();
@@ -42,11 +47,11 @@ const CheckoutPage: React.FC = () => {
     control,
     setValue,
     formState: { errors },
-  } = useForm({
+  } = useForm<FormData>({
     resolver: yupResolver(validationSchema),
   });
 
-  // بررسی وضعیت ورود و بستن مودال
+  // بررسی وضعیت ورود و تنظیم اطلاعات کاربر
   useEffect(() => {
     if (isAuthenticated) {
       const storedName = localStorage.getItem("fullname");
@@ -95,7 +100,7 @@ const CheckoutPage: React.FC = () => {
   };
 
   // مدیریت دکمه Place Order
-  const handlePlaceOrder = async (data: any) => {
+  const handlePlaceOrder = async (data: FormData) => {
     if (!isAuthenticated) {
       setOpenModal(true);
       return;

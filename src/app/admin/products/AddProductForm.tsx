@@ -20,7 +20,7 @@ interface AddProductFormProps {
 }
 
 const AddProductForm: React.FC<AddProductFormProps> = ({
-  onAddProduct,
+
   initialProduct,
 }) => {
   const { control, handleSubmit, reset } = useForm<Product>({

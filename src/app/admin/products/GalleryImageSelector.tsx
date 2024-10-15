@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Box, Grid, Typography, Button } from '@mui/material';
+import Image from 'next/image'; // ایمپورت کامپوننت Image
 
 interface GalleryImageSelectorProps {
   onAddImage: (imageUrl: string) => void; // Function to add the selected image to the product
@@ -64,17 +65,18 @@ const GalleryImageSelector: React.FC<GalleryImageSelectorProps> = ({ onAddImage 
                 '&:hover': { transform: 'scale(1.05)' } 
               }}
             >
-              <img
-                src={image} 
+              {/* استفاده از کامپوننت Image به جای img */}
+              <Image
+                src={image}
                 alt={`Gallery Image ${index}`}
+                width={85} // عرض دقیق تصویر
+                height={85} // ارتفاع دقیق تصویر
                 style={{
-                  width: '85px', 
-                  height: '85px',
                   cursor: 'pointer',
                   border: selectedImage === image ? '2px solid blue' : 'none',
-                  objectFit: 'cover',
                   borderRadius: '4px',
-                  marginBottom: '4px' // Small margin between the image and button
+                  marginBottom: '4px', // Small margin between the image and button
+                  objectFit: 'cover',
                 }}
                 onClick={() => handleImageSelect(image)} 
               />
@@ -95,10 +97,13 @@ const GalleryImageSelector: React.FC<GalleryImageSelectorProps> = ({ onAddImage 
       {selectedImage && (
         <Box mt={2}>
           <Typography variant="h6">Selected Image:</Typography>
-          <img 
-            src={selectedImage} 
-            alt="Selected" 
-            style={{ width: '300px', height: 'auto', borderRadius: '8px' }} 
+          {/* استفاده از Image برای تصویر انتخاب شده */}
+          <Image 
+            src={selectedImage}
+            alt="Selected"
+            width={300}
+            height={300}
+            style={{ borderRadius: '8px' }}
           />
           <Button 
             variant="contained" 

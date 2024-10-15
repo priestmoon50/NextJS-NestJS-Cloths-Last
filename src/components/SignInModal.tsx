@@ -38,7 +38,7 @@ const SignInModal: React.FC<SignInModalProps> = ({ open, onClose }) => {
             </Link>.
           </Typography>
           <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-            If you don't have an account, please{" "}
+            If you don&apos;t have an account, please{" "}
             <Link href="/auth/phone-verification" style={{ color: "blue", fontWeight: "bold" }}>
               register
             </Link>.

@@ -6,7 +6,7 @@ const ProductFilters: React.FC<{ setPriceRange: (range: number[]) => void }> = (
   const { t } = useTranslation(); // استفاده از useTranslation برای ترجمه‌ها
   const [value, setValue] = useState<number[]>([100, 1000]); // مقدار پیش‌فرض
 
-  const handlePriceChange = (event: any, newValue: number | number[]) => {
+  const handlePriceChange = (event: Event, newValue: number | number[]) => {
     setValue(newValue as number[]);
     setPriceRange(newValue as number[]);
   };

@@ -79,7 +79,7 @@ export default function ProductGrid() {
                 className={styles.productImage}
                 sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
-              {product.status && (
+              {typeof product.status === 'string' && (
                 <Box
                   sx={{
                     position: "absolute",
@@ -99,7 +99,7 @@ export default function ProductGrid() {
               {product.name}
             </Typography>
             <Typography variant="body2" color="textSecondary">
-              {product.category}
+              {product.category || 'No Category'}
             </Typography>
             <Typography variant="h6" color="primary">
               ${product.price}

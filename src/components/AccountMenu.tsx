@@ -8,7 +8,6 @@ import ShopIcon from "@mui/icons-material/ShoppingBag";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import styles from "./AccountMenu.module.css";
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -17,7 +16,6 @@ const AccountMenu: React.FC = () => {
   const { t } = useTranslation(); 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { logout, isAuthenticated } = useAuth();
-  const router = useRouter();
 
   const handleMouseEnter = useCallback(
     (event: React.MouseEvent<HTMLElement>) => {
@@ -35,7 +33,6 @@ const AccountMenu: React.FC = () => {
     localStorage.removeItem('cart'); // پاک کردن سبد خرید از localStorage
     window.location.reload(); // رفرش کل صفحه
   }, [logout]);
-  
   
   return (
     <Box
@@ -135,6 +132,6 @@ const AccountMenu: React.FC = () => {
       </Menu>
     </Box>
   );
-}
+};
 
 export default AccountMenu;

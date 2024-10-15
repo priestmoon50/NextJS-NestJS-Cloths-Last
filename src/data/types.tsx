@@ -1,18 +1,16 @@
 // src/data/types.ts
 
-
 // تایپ‌های مربوط به محصولات
 export interface Product {
-  [x: string]: any;
-  _id: any;
+  _id: string; // فرض اینکه همیشه _id رشته است
   id: string | number;
   name: string;
   price: number;
   image: string;
   images?: string[];
   category?: string;
-  sizes?: string | number | (string | number)[]; // انعطاف‌پذیری در نوع سایزها
-  colors?: string | number | (string | number)[]; // انعطاف‌پذیری در نوع رنگ‌ها
+  sizes?: Array<string | number>; // انعطاف‌پذیری در نوع سایزها
+  colors?: Array<string | number>; // انعطاف‌پذیری در نوع رنگ‌ها
   description?: string;
   rating?: number;
   stock?: number;
@@ -20,6 +18,7 @@ export interface Product {
   discount?: number;
   imageUrl?: string;
   quantity?: number;
+  [x: string]: unknown; // انعطاف‌پذیری برای اضافه کردن هر فیلد اضافی
 }
 
 // تایپ‌های مربوط به آیتم‌های سبد خرید
@@ -43,11 +42,12 @@ export interface User {
 
 // تایپ‌های مربوط به سفارشات
 export interface Order {
-  [x: string]: string | number | Date;
   id: string;
   user: string;
   totalPrice: number;
   status: 'Pending' | 'Shipped' | 'Delivered' | 'Cancelled'; // محدود کردن مقادیر وضعیت
+  date: Date; // فرض بر اینکه سفارشات تاریخ دارند
+  [x: string]: string | number | Date | undefined; // انعطاف‌پذیری برای اضافه کردن فیلدهای دیگر
 }
 
 export interface ProductRatingProps {
@@ -83,7 +83,7 @@ export interface PasswordFieldProps {
   label: string;
   error: boolean;
   helperText?: string;  // string | undefined
-  register: any;
+  register: (name: string) => { onChange: () => void }; // تایپ دقیق‌تر برای تابع register
 }
 
 export interface SubmitButtonProps {
