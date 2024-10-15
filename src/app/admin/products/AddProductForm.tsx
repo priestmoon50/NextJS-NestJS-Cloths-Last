@@ -13,6 +13,7 @@ import { Product } from "@/data/types";
 import axios from "axios";
 import styles from "./AddProductForm.module.css";
 import GalleryImageSelector from "./GalleryImageSelector"; // وارد کردن GalleryImageSelector برای انتخاب عکس از گالری
+import Image from "next/image"; // وارد کردن Image از next/image
 
 interface AddProductFormProps {
   onAddProduct: (product: Product) => void;
@@ -20,7 +21,6 @@ interface AddProductFormProps {
 }
 
 const AddProductForm: React.FC<AddProductFormProps> = ({
-
   initialProduct,
 }) => {
   const { control, handleSubmit, reset } = useForm<Product>({
@@ -244,10 +244,12 @@ const AddProductForm: React.FC<AddProductFormProps> = ({
         <Grid container spacing={2}>
           {addedImages.map((image, index) => (
             <Grid item xs={2} key={index}>
-              <img
+              <Image
                 src={image}
                 alt={`Selected Image ${index}`}
-                style={{ width: "100px", height: "100px", objectFit: "cover" }}
+                width={100}
+                height={100}
+                style={{ objectFit: "cover" }}
               />
             </Grid>
           ))}

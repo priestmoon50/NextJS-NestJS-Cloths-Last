@@ -10,13 +10,12 @@ import styles from './ProductsList.module.css';
 
 interface ProductsListProps {
   onDeleteProduct: (id: number) => void;
-  onEditProduct: (product: Product) => void;
   products: Product[]; // مطمئن شوید که محصولات نیز به عنوان props تعریف شده‌اند
 }
 
 const fetchProducts = async (): Promise<Product[]> => {
   const { data } = await axios.get('http://localhost:3001/products');
-  return data.map((product: any) => ({
+  return data.map((product: Product) => ({
     ...product,
     id: product._id, // تبدیل _id به id
   }));
@@ -26,7 +25,7 @@ const deleteProduct = async (id: string) => {
   await axios.delete(`http://localhost:3001/products/${id}`);
 };
 
-const ProductsList: React.FC<ProductsListProps> = ({ onEditProduct }) => {
+const ProductsList: React.FC<ProductsListProps> = () => {
   const queryClient = useQueryClient();
 
   const { data: products = [], isLoading, error } = useQuery<Product[], Error>({
@@ -60,7 +59,7 @@ const ProductsList: React.FC<ProductsListProps> = ({ onEditProduct }) => {
     setOpen(false);
   };
 
-  // ستون‌ها برای DataGrid با تغییرات
+  // ستون‌ها برای DataGrid
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'Product ID', width: 150 },
     { field: 'name', headerName: 'Name', width: 150 },
@@ -72,18 +71,8 @@ const ProductsList: React.FC<ProductsListProps> = ({ onEditProduct }) => {
       field: 'actions',
       headerName: 'Actions',
       width: 250,
-      renderCell: (params) => (
+      renderCell: (params: { row: { id: string } }) => (
         <Box>
-          {/* دکمه ویرایش، اگر نیاز است */}
-          {/* <Button
-            className={styles.actionsButton}
-            variant="contained"
-            color="primary"
-            onClick={() => onEditProduct(params.row)}
-          >
-            Edit
-          </Button> */}
-          
           <Button
             variant="contained"
             color="secondary"

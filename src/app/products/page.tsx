@@ -13,27 +13,22 @@ import { motion } from "framer-motion";
 // تابع fetch محصولات
 const fetchProducts = async (): Promise<Product[]> => {
   const { data } = await axios.get("http://localhost:3001/products");
-  return data.map((product: any) => ({
+  return data.map((product: Product) => ({
     ...product,
     id: product._id, // تبدیل _id به id
   }));
 };
 
 export default function Home() {
-  // تنظیم پیش‌فرض قیمت از 1 تا 200
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [priceRange, setPriceRange] = useState<number[]>([1, 200]);
 
   // دریافت محصولات از API با استفاده از React Query
-  const { data: allProducts = [], isLoading, error } = useQuery<
-    Product[],
-    Error
-  >({
+  const { data: allProducts = [], isLoading, error } = useQuery<Product[], Error>({
     queryKey: ["products"],
     queryFn: fetchProducts,
   });
 
-  // اضافه کردن لاگ برای دیباگ
   useEffect(() => {
     if (allProducts.length > 0) {
       console.log("Products fetched successfully:", allProducts);
@@ -67,7 +62,6 @@ export default function Home() {
       <ProductCategories setSelectedCategory={setSelectedCategory} />
       <ProductFilters setPriceRange={setPriceRange} />
 
-      {/* در صورت خالی بودن لیست محصولات */}
       {filteredProducts.length === 0 && (
         <Typography variant="h6" align="center">
           No products available for the selected filters.

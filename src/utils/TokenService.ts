@@ -1,3 +1,9 @@
+interface JWTPayload {
+  exp: number; // زمان انقضا
+  iat?: number; // زمان صدور (اختیاری)
+  [key: string]: unknown; // برای پشتیبانی از فیلدهای دلخواه دیگر
+}
+
 class TokenService {
   private tokenKey = 'token';  // کلید ذخیره توکن در localStorage
 
@@ -58,7 +64,7 @@ class TokenService {
   }
 
   // متد برای دریافت payload توکن
-  getTokenPayload(): any | null {
+  getTokenPayload(): JWTPayload | null {
     const token = this.getToken();
     if (!token) {
       return null;
@@ -67,17 +73,17 @@ class TokenService {
   }
 
   // متد کمکی برای دیکد کردن JWT و استخراج payload
-  private parseJwt(token: string): any {
+  private parseJwt(token: string): JWTPayload | null {
     try {
       const base64Url = token.split('.')[1];
       const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
       const jsonPayload = decodeURIComponent(
         atob(base64)
           .split('')
-          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
           .join('')
       );
-      return JSON.parse(jsonPayload);
+      return JSON.parse(jsonPayload) as JWTPayload;
     } catch (error) {
       console.error('Invalid token format:', error);
       return null;
@@ -85,4 +91,6 @@ class TokenService {
   }
 }
 
-export default new TokenService();  // صادر کردن یک نمونه از کلاس
+// صادر کردن نمونه مشخص از کلاس
+const tokenServiceInstance = new TokenService();
+export default tokenServiceInstance;

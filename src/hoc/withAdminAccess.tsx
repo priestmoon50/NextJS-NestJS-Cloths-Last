@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation'; // استفاده از سیستم مسیریابی جدید Next.js
 
-const withAdminAccess = (WrappedComponent: React.ComponentType) => {
-  return function AdminAccessComponent(props: any) {
+const withAdminAccess = <P extends object>(WrappedComponent: React.ComponentType<P>) => {
+  return function AdminAccessComponent(props: P) { // تایپ props به P که تایپ عمومی است تغییر یافت
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 

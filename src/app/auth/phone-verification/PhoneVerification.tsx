@@ -16,7 +16,6 @@ export default function PhoneVerification() {
   const [isCodeConfirmed, setIsCodeConfirmed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [token, setToken] = useState("");
 
   const sendPhone = async () => {
     setLoading(true);
@@ -58,7 +57,6 @@ export default function PhoneVerification() {
         // ذخیره role کاربر
         localStorage.setItem("role", response.data.user.role || "user");
         setIsCodeConfirmed(true);
-        setToken(response.data.accessToken);
         setError("");
       } else {
         setError("Invalid code or failed to login");
