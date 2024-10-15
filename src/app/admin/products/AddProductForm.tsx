@@ -125,7 +125,9 @@ const AddProductForm: React.FC<AddProductFormProps> = ({
             {...field}
             multiple
             value={field.value || []}
-            onChange={field.onChange}
+            onChange={(event) =>
+              field.onChange(event.target.value as string[])
+            } // تبدیل به string[]
             renderValue={(selected) => (selected as string[]).join(", ")}
           >
             {availableColors.map((color) => (
@@ -178,7 +180,9 @@ const AddProductForm: React.FC<AddProductFormProps> = ({
             {...field}
             multiple
             value={field.value || []}
-            onChange={field.onChange}
+            onChange={(event) =>
+              field.onChange(event.target.value as string[])
+            } // تبدیل به string[]
             renderValue={(selected) => (selected as string[]).join(", ")}
           >
             {availableSizes.map((size) => (
