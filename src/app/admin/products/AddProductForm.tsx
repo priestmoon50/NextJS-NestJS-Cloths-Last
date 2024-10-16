@@ -32,7 +32,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({
       sizes: [],
       category: "",
       images: [],
-      sizeGuide: "", // فیلد جدید برای سایز
+      sizeGuide: [],// فیلد جدید برای سایز
     },
   });
 

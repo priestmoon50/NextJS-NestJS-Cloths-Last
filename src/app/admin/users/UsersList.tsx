@@ -1,8 +1,15 @@
 'use client';
 import React, { useState } from 'react';
 import { DataGrid, GridPaginationModel } from '@mui/x-data-grid';
-import { User } from '@/data/types'; // فرض می‌کنیم اینترفیس User از types.ts استخراج شده
 import styles from './UsersList.module.css'; // اضافه کردن CSS Module
+
+// تعریف اینترفیس User
+interface User {
+  id: string;
+  name: string;
+  phone: string;
+  role: string;
+}
 
 const users: User[] = [
   {

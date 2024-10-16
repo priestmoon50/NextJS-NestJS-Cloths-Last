@@ -10,8 +10,10 @@ import styles from './ProductsList.module.css';
 
 interface ProductsListProps {
   onDeleteProduct: (id: number) => void;
-  products: Product[]; // مطمئن شوید که محصولات نیز به عنوان props تعریف شده‌اند
+  products: Product[];
+  onEditProduct: (product: Product) => void; // این خط را اضافه کنید
 }
+
 
 const fetchProducts = async (): Promise<Product[]> => {
   const { data } = await axios.get('http://localhost:3001/products');

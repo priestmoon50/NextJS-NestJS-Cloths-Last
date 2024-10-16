@@ -14,6 +14,8 @@ export interface Product {
   description?: string;
   rating?: number;
   stock?: number;
+  sizeGuide?: string[];
+  
   reviews?: string[];
   discount?: number;
   imageUrl?: string;
