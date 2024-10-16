@@ -1,7 +1,20 @@
 import { Controller, Get, Patch, Param, Body, HttpCode, HttpStatus, UseGuards, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard'; // وارد کردن JwtAuthGuard
-import { Request } from 'express'; // وارد کردن Request برای استفاده از @Req
+import type { Request } from 'express'; // وارد کردن Request برای استفاده از @Req
+
+
+interface AuthenticatedRequest extends Request {
+  user?: {
+    userId: string;
+    email: string;
+    role: 'user' | 'admin';
+    phone: string;
+    fullname?: string;
+    address?: string;
+  };
+}
+
 
 @Controller('users')
 export class UsersController {
@@ -13,20 +26,24 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)  // احراز هویت با JWT
   @Get('account')  // مسیر دریافت اطلاعات کاربر
   @HttpCode(HttpStatus.OK)
-  async getAccountInfo(@Req() req: Request) {
-    const userId = req.user['userId'];  // دریافت userId از JWT
-    const user = await this.usersService.findOne(userId);
+  async getAccountInfo(@Req() req: AuthenticatedRequest) {
+    if (!req.user || !req.user.userId) {
+      throw new Error('User not authenticated');
+    }
     
-    // بازگرداندن اطلاعات کاربر حتی اگر خالی باشند
+    const userId = req.user.userId;
+    const user = await this.usersService.findOne(userId);
+  
     return {
       message: 'User retrieved successfully',
       phone: user.phone,
-      email: user.email || '',  // اگر خالی است، یک مقدار پیش‌فرض (مثل رشته خالی) برگردانید
+      email: user.email || '',
       address: user.address || '',
       fullname: user.fullname || '',
       role: user.role || 'user'
     };
   }
+
 
   
 // با استفاده از role میتونیم هر کدوم از کاربر هایی رو که خواستیم به  بهشون role ادمین بدیم تا به بقیه بخش های admin panel دسترسی داشته باشند

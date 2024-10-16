@@ -6,16 +6,16 @@ export type UserDocument = User & Document;
 @Schema()
 export class User {
   @Prop({ required: true, unique: true })
-  phone: string;
+  phone!: string;
 
   @Prop()
-  otp: string;
+  otp!: string;
 
   @Prop()
-  otpExpiryTime: number;
+  otpExpiryTime!: number;
 
   @Prop({ default: false })
-  isVerified: boolean;
+  isVerified!: boolean;
 
   @Prop({ required: false })
   email?: string;
@@ -32,7 +32,7 @@ export class User {
     enum: ['user', 'admin'],  // فقط دو مقدار user و admin را قبول می‌کند
     default: 'user',  // به صورت پیش‌فرض نقش کاربر user است
   })
-  role: string;
+  role!: string;
 
   _id?: Types.ObjectId; 
 }

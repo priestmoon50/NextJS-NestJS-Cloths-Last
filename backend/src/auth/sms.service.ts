@@ -39,7 +39,11 @@ export class SmsService {
           throw new InternalServerErrorException('Failed to send verification code. Please try again.');
         }
       } catch (error) {
-        this.logger.error(`Error sending SMS to ${phone}: ${error.message}`);
+        if (error instanceof Error) {
+          this.logger.error(`Error sending SMS to ${phone}: ${error.message}`);
+        } else {
+          this.logger.error(`Error sending SMS to ${phone}: ${error}`);
+        }
         throw new InternalServerErrorException('Failed to send verification code. Please try again.');
       }
     }

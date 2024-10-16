@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } else {
       res.status(404).json({ message: 'Product not found' }); // اگر محصول یافت نشد
     }
-  } catch (error) {
+  } catch {
     res.status(500).json({ message: 'Error fetching product' }); // مدیریت خطاها
   }
 }

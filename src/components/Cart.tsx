@@ -22,7 +22,7 @@ const Cart: React.FC = () => {
       await updateItem(id, newQuantity);
       setLoading(false);  // پایان لودینگ
       setError(null);  // پاک کردن خطا
-    } catch (e) {
+    } catch  {
       setError(t('error.updateFailed'));
       setLoading(false); // لودینگ به پایان
     }
@@ -33,7 +33,7 @@ const Cart: React.FC = () => {
     try {
       await removeItem(id);
       setLoading(false);
-    } catch (error) {
+    } catch  {
       setError(t('error.failedToRemoveItem'));
       setLoading(false);
     }

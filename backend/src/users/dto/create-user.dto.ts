@@ -6,5 +6,5 @@ export class CreateUserDto {
   @Matches(/^[+\d][\d\s().-]{6,20}$/, {
     message: 'Phone number must be a valid international number',
   })
-  phone: string;
+  phone!: string;
 }

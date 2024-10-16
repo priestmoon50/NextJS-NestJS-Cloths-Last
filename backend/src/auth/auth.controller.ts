@@ -43,7 +43,11 @@ async handleNewUser(phone: string, email?: string, address?: string, fullname?: 
     await this.usersService.createTemporaryUser(phone, otp, otpExpiryTime, email, address, fullname);
     this.logger.log(`Temporary user created successfully for phone: ${phone}`);
   } catch (error) {
-    this.logger.error(`Error creating temporary user for phone ${phone}: ${error.message}`);
+    if (error instanceof Error) {
+      this.logger.error(`Error creating temporary user for phone ${phone}: ${error.message}`);
+    } else {
+      this.logger.error(`Error creating temporary user for phone ${phone}: ${error}`);
+    }
     throw error;
   }
 

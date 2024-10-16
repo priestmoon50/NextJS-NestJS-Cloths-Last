@@ -35,7 +35,8 @@ export class AuthService {
 
   // ذخیره کد تایید به همراه زمان انقضا
   async saveVerificationCode(phone: string, code: string): Promise<void> {
-    const expiresAt = Date.now() + (parseInt(process.env.CODE_EXPIRATION_TIME) || 10 * 60 * 1000); 
+    const expiresAt = Date.now() + (parseInt(process.env.CODE_EXPIRATION_TIME || '600000'));
+
     const hashedCode = await bcrypt.hash(code, 10);
     this.verificationCodes.set(phone, { code: hashedCode, expiresAt });
     this.logger.log(`Verification code for ${phone} saved successfully.`);

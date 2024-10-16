@@ -17,7 +17,11 @@ export class ProductsController {
       // ارسال اطلاعات محصول به سرویس برای ایجاد محصول
       return await this.productsService.create(productData);
     } catch (error) {
-      console.error('Error creating product:', error.message);
+      if (error instanceof Error) {
+        console.error('Error creating product:', error.message);
+      } else {
+        console.error('Unknown error creating product:', error);
+      }
       throw new Error('Failed to create product');
     }
   }

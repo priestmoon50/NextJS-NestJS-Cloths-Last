@@ -6,7 +6,7 @@ export type OrderDocument = Order & Document;
 @Schema()
 export class Order {
   @Prop({ required: true })
-  userId: string;
+  userId!: string;
 
   @Prop({ required: true, type: [{
     productId: String,
@@ -16,7 +16,7 @@ export class Order {
     size: { type: String, required: false },
     color: { type: String, required: false }
   }]})
-  items: {
+  items!: {
     productId: string;
     name: string;
     price: number;
@@ -26,22 +26,22 @@ export class Order {
   }[];
 
   @Prop({ required: true })
-  totalPrice: number;
+  totalPrice!: number;
 
   @Prop({ required: true, enum: ['Pending', 'Processing', 'Completed'], default: 'Pending' })
-  status: 'Pending' | 'Processing' | 'Completed';
+  status!: 'Pending' | 'Processing' | 'Completed';
 
   @Prop({ required: true })
-  name: string;
+  name!: string;
 
   @Prop({ required: true })
-  address: string;
+  address!: string;
 
   @Prop({ required: true })
-  phone: string;
+  phone!: string;
 
   @Prop({ default: Date.now })
-  createdAt: Date;
+  createdAt!: Date;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);

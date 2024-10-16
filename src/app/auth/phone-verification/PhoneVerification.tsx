@@ -61,7 +61,7 @@ export default function PhoneVerification() {
       } else {
         setError("Invalid code or failed to login");
       }
-    } catch (err) {
+    } catch  {
       setError("Failed to verify code");
     } finally {
       setLoading(false);

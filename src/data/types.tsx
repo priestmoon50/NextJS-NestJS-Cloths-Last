@@ -91,6 +91,8 @@ export interface SubmitButtonProps {
   label: string;
 }
 
+
+
 export interface LinkButtonsProps {
   forgotPasswordLink: string;
   registerLink: string;

@@ -28,7 +28,11 @@ async create(userData: { phone: string, email?: string, address?: string, fullna
     });
     return await createdUser.save();
   } catch (error) {
-    this.logger.error(`Failed to create user: ${error.message}`);
+    if (error instanceof Error) {
+      this.logger.error(`Failed to create user: ${error.message}`);
+    } else {
+      this.logger.error('An unknown error occurred while creating user');
+    }
     throw new NotFoundException('Failed to create user. Please try again.');
   }
 }
@@ -44,8 +48,12 @@ async create(userData: { phone: string, email?: string, address?: string, fullna
  try {
    return await user.save();
  } catch (error) {
-   this.logger.error(`Failed to assign role: ${error.message}`);
-   throw new NotFoundException('Failed to assign role.');
+  if (error instanceof Error) {
+    this.logger.error(`Failed to assign role: ${error.message}`);
+  } else {
+    this.logger.error('An unknown error occurred while assigning role');
+  }
+  throw new NotFoundException('Failed to assign role.');
  }
 }
 
@@ -104,13 +112,18 @@ async createTemporaryUser(phone: string, otp: string, otpExpiryTime: number, ema
   });
 
   try {
-    const savedUser = await createdUser.save(); // ذخیره کاربر موقت در دیتابیس
+    const savedUser = await createdUser.save();
     this.logger.log(`Temporary user created successfully for phone: ${phone}`);
     return savedUser;
   } catch (error) {
-    this.logger.error(`Failed to create temporary user for phone: ${phone}, error: ${error.message}`);
+    if (error instanceof Error) {
+      this.logger.error(`Failed to create temporary user for phone: ${phone}, error: ${error.message}`);
+    } else {
+      this.logger.error(`Unknown error occurred while creating temporary user for phone: ${phone}`);
+    }
     throw new NotFoundException('Failed to create temporary user.');
   }
+  
 }
 
 
@@ -170,10 +183,15 @@ async createTemporaryUser(phone: string, otp: string, otpExpiryTime: number, ema
     try {
       return await this.userModel.find().exec();
     } catch (error) {
-      this.logger.error(`Failed to fetch users: ${error.message}`);
+      if (error instanceof Error) {
+        this.logger.error(`Failed to fetch users: ${error.message}`);
+      } else {
+        this.logger.error('Unknown error occurred while fetching users.');
+      }
       throw new NotFoundException('Failed to fetch users.');
     }
   }
+  
 
   async findOne(id: string): Promise<User> {
     try {
@@ -181,12 +199,17 @@ async createTemporaryUser(phone: string, otp: string, otpExpiryTime: number, ema
       if (!user) {
         throw new NotFoundException(`User with ID ${id} not found.`);
       }
-      return user;  // user.role به درستی باید برگردانده شود
+      return user;
     } catch (error) {
-      this.logger.error(`Failed to fetch user with ID ${id}: ${error.message}`);
+      if (error instanceof Error) {
+        this.logger.error(`Failed to fetch user with ID ${id}: ${error.message}`);
+      } else {
+        this.logger.error(`Unknown error occurred while fetching user with ID ${id}.`);
+      }
       throw new NotFoundException(`Failed to fetch user with ID ${id}.`);
     }
   }
+  
   
 
   async update(id: string, userData: { phone?: string }): Promise<User> {
@@ -197,11 +220,15 @@ async createTemporaryUser(phone: string, otp: string, otpExpiryTime: number, ema
       }
       return updatedUser;
     } catch (error) {
-      this.logger.error(`Failed to update user with ID ${id}: ${error.message}`);
+      if (error instanceof Error) {
+        this.logger.error(`Failed to update user with ID ${id}: ${error.message}`);
+      } else {
+        this.logger.error('Unknown error occurred while updating user.');
+      }
       throw new NotFoundException(`Failed to update user with ID ${id}.`);
     }
   }
-
+  
   async remove(id: string): Promise<User> {
     try {
       const deletedUser = await this.userModel.findByIdAndDelete(id).exec();
@@ -210,8 +237,13 @@ async createTemporaryUser(phone: string, otp: string, otpExpiryTime: number, ema
       }
       return deletedUser;
     } catch (error) {
-      this.logger.error(`Failed to delete user with ID ${id}: ${error.message}`);
+      if (error instanceof Error) {
+        this.logger.error(`Failed to delete user with ID ${id}: ${error.message}`);
+      } else {
+        this.logger.error('Unknown error occurred while deleting user.');
+      }
       throw new NotFoundException(`Failed to delete user with ID ${id}.`);
     }
   }
+  
 }

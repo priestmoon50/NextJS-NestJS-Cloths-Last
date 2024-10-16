@@ -4,50 +4,51 @@ import { Type } from 'class-transformer';
 export class CreateOrderDto {
   @IsNotEmpty()
   @IsString()
-  readonly userId: string;
+  readonly userId!: string; // استفاده از علامت تعجب
+
 
   @IsNotEmpty()
   @Type(() => ItemDto)
-  readonly items: ItemDto[];
+  readonly items!: ItemDto[];
 
   @IsNotEmpty()
   @IsNumber()
-  readonly totalPrice: number;
+  readonly totalPrice!: number;
 
   @IsNotEmpty()
   @IsString()
   @IsIn(['Pending', 'Processing', 'Completed'])
-  readonly status: 'Pending' | 'Processing' | 'Completed';
+  readonly status!: 'Pending' | 'Processing' | 'Completed';
 
   @IsNotEmpty()
   @IsString()
-  readonly name: string;
+  readonly name!: string;
 
   @IsNotEmpty()
   @IsString()
-  readonly address: string;
+  readonly address!: string;
 
   @IsNotEmpty()
   @IsString()
-  readonly phone: string;
+  readonly phone!: string;
 }
 
 export class ItemDto {
   @IsNotEmpty()
   @IsString()
-  productId: string;
+  productId!: string;
 
   @IsNotEmpty()
   @IsString()
-  name: string;
+  name!: string;
 
   @IsNotEmpty()
   @IsNumber()
-  price: number;
+  price!: number;
 
   @IsNotEmpty()
   @IsNumber()
-  quantity: number;
+  quantity!: number;
 
   @IsOptional()
   @IsString()
@@ -62,5 +63,5 @@ export class UpdateOrderStatusDto {
   @IsNotEmpty()
   @IsString()
   @IsIn(['Pending', 'Processing', 'Completed'])
-  readonly status: 'Pending' | 'Processing' | 'Completed';
+  readonly status!: 'Pending' | 'Processing' | 'Completed';
 }
